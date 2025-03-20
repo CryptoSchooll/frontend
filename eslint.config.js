@@ -50,6 +50,7 @@ export default tseslint.config(
           tailwindStylesheet: "./src/index.css",
           tailwindPreserveWhitespace: true,
           tailwindPreserveDuplicates: true,
+          endOfLine: "auto",
         },
       ],
       "react/jsx-sort-props": [
