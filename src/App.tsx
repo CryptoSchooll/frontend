@@ -1,23 +1,34 @@
-import { useState } from "react"
+import Navbar from "./components/Navbar"
+import usePage from "./hooks/usePage"
+import Broadcast from "./pages/Broadcast"
+import Clans from "./pages/Clans"
+import Home from "./pages/Home"
+import Quizzes from "./pages/Quizzes"
+import Tasks from "./pages/Tasks"
 
-import Camera from "./components/core/camera"
+const renderPage = (page: string) => {
+  switch (page) {
+    case "home":
+      return <Home />
+    case "quizzes":
+      return <Quizzes />
+    case "tasks":
+      return <Tasks />
+    case "broadcast":
+      return <Broadcast />
+    case "clans":
+      return <Clans />
+    default:
+      return <Home />
+  }
+}
 
 const App: React.FC = () => {
-  const [count, setCount] = useState(0)
+  const { currentPage } = usePage()
   return (
-    <div className="h-screen">
-      <Camera>
-        <div
-          className="flex h-[300px] w-[400px] flex-col items-center justify-center bg-green-500 bg-opacity-50"
-          style={{
-            transform: "scale(1)",
-          }}
-        >
-          <h2 className="text-xl font-bold">Core gameplay</h2>
-          <p>{count}</p>
-          <button onClick={() => setCount((prev) => prev + 1)}>click</button>
-        </div>
-      </Camera>
+    <div className="flex h-screen flex-col">
+      <div className="flex-1">{renderPage(currentPage)}</div>
+      <Navbar />
     </div>
   )
 }
