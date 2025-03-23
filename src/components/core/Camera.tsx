@@ -11,10 +11,10 @@ const Scene: FC<PropsWithChildren> = ({ children }) => {
 
   useFrame(() => {
     if (controlsRef.current) {
-      const minX = -100,
-        maxX = 100,
-        minZ = -100,
-        maxZ = 100
+      const minX = -400,
+        maxX = 400,
+        minZ = -400,
+        maxZ = 400
       const { target, object } = controlsRef.current
 
       target.x = Math.max(minX, Math.min(maxX, target.x))

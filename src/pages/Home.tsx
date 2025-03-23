@@ -1,21 +1,82 @@
-import { useState } from "react"
-
 import Camera from "../components/core/Camera"
 
+const pos: Record<
+  string,
+  {
+    rotate: number
+    top: number
+    left: number
+  }
+> = {
+  right: {
+    rotate: 0,
+    top: 0,
+    left: 0,
+  },
+  left: {
+    rotate: 180,
+    top: 0,
+    left: -200,
+  },
+  up: {
+    rotate: -90,
+    top: -100,
+    left: -100,
+  },
+  down: {
+    rotate: 90,
+    top: 100,
+    left: -100,
+  },
+}
+
 const Home = () => {
-  const [count, setCount] = useState(0)
+  const data = [
+    {
+      startX: 0,
+      startY: 0,
+      endX: 0,
+      endY: -1,
+      direction: "down",
+      classes: [],
+    },
+    {
+      startX: 0,
+      startY: -1,
+      endX: 1,
+      endY: -1,
+      direction: "right",
+      classes: [],
+    },
+  ]
+
   return (
     <div className="h-full">
       <Camera>
-        <div
-          className="flex h-[300px] w-[400px] flex-col items-center justify-center bg-green-500 bg-opacity-50"
-          style={{
-            transform: "scale(1)",
-          }}
-        >
-          <h2 className="text-xl font-bold">Core gameplay</h2>
-          <p>{count}</p>
-          <button onClick={() => setCount((prev) => prev + 1)}>click</button>
+        <div className="relative size-[1200px] bg-green-400">
+          {data.map((corridor, i) => {
+            const posMeta = pos[corridor.direction]
+
+            return (
+              <div
+                key={i}
+                className="z-1 absolute h-[20px] w-[200px] bg-amber-400"
+                style={{
+                  top: `${(3 + -corridor.startY) * 200 - 10 + posMeta.top}px`,
+                  left: `${(3 + corridor.startX) * 200 + posMeta.left}px`,
+                  transform: `rotate(${posMeta.rotate}deg)`,
+                }}
+              ></div>
+            )
+          })}
+          <div className="absolute top-0 grid size-full grid-cols-6 grid-rows-6 bg-green-400">
+            {Array.from({ length: 36 }).map((_, index) => (
+              <div
+                key={index}
+                className="size-full border border-green-500 bg-black"
+              />
+            ))}
+          </div>
         </div>
       </Camera>
     </div>
