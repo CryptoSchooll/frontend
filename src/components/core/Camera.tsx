@@ -52,7 +52,10 @@ const Scene: FC<PropsWithChildren> = ({ children }) => {
 
 const Camera: FC<PropsWithChildren> = ({ children }) => {
   return (
-    <Canvas camera={{ position: [0, 200, 0], fov: 50 }}>
+    <Canvas
+      camera={{ position: [0, 200, 0], fov: 50 }}
+      style={{ background: "transparent" }} // Убираем серый фон
+    >
       <Scene>{children}</Scene>
     </Canvas>
   )
