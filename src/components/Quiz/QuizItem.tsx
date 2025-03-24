@@ -1,4 +1,4 @@
-import type React from "react"
+import type { FC } from "react"
 
 interface QuizItemProps {
   id: string
@@ -9,7 +9,7 @@ interface QuizItemProps {
   correctAnswers: number
 }
 
-const QuizItem: React.FC<QuizItemProps> = ({
+const QuizItem: FC<QuizItemProps> = ({
   id,
   tasksCount,
   isAvailable,

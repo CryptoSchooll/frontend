@@ -1,12 +1,10 @@
-import type React from "react"
-
 import { useCallback, useEffect, useState } from "react"
-
-import { useQuizStore } from "../../hooks/quizStore"
 
 import ConfirmModal from "./ConfirmModal"
 import QuizBox from "./QuizBox"
 import QuizItem from "./QuizItem"
+
+import { useQuizStore } from "@/hooks/quizStore"
 
 const QuizList: React.FC = () => {
   const {

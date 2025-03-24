@@ -1,8 +1,8 @@
-import type { PropsWithChildren } from "react"
+import type { FC, PropsWithChildren } from "react"
 
 import ReactDOM from "react-dom"
 
-const CameraPortal: React.FC<PropsWithChildren> = ({ children }) => {
+const CameraPortal: FC<PropsWithChildren> = ({ children }) => {
   let portalRoot = document.getElementById("portal-root")
   if (!portalRoot) {
     portalRoot = document.createElement("div")

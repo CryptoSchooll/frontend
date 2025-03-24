@@ -1,6 +1,6 @@
-import type React from "react"
+import type { FC } from "react"
 
-const UserHeader: React.FC = () => {
+const UserHeader: FC = () => {
   return (
     // Убираем left-[33px] top-[19px] и делаем контейнер relative + mx-auto
     <div className="relative mx-auto h-16 w-80">

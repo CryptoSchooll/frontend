@@ -1,4 +1,4 @@
-import type React from "react"
+import type { FC } from "react"
 
 interface ConfirmModalProps {
   message: string
@@ -6,7 +6,7 @@ interface ConfirmModalProps {
   onCancel: () => void
 }
 
-const ConfirmModal: React.FC<ConfirmModalProps> = ({
+const ConfirmModal: FC<ConfirmModalProps> = ({
   message,
   onConfirm,
   onCancel,
