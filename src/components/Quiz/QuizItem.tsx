@@ -11,28 +11,38 @@ interface QuizItemProps {
 
 const QuizItem: React.FC<QuizItemProps> = ({
   id,
-  title,
   tasksCount,
   isAvailable,
   solved,
   correctAnswers,
 }) => {
+  // Подготавливаем текст статуса (справа)
+  let statusText = "→"
+  if (solved) {
+    statusText = `completed ${correctAnswers}/${tasksCount}`
+  } else if (!isAvailable) {
+    statusText = "locked"
+  }
+
   return (
-    <div
-      className={`flex w-full items-center justify-between rounded-md border border-gray-300 p-3 shadow-sm ${
-        !isAvailable ? "opacity-50" : ""
-      }`}
-      data-id={id}
-    >
-      <div className="flex flex-col">
-        <span className="font-semibold text-gray-800">{title}</span>
-        <span className="text-sm text-gray-500">
-          {solved
-            ? `Решено: ${correctAnswers}/${tasksCount}`
-            : `Заданий: ${tasksCount}`}
-        </span>
+    <div className="relative h-14 w-96" data-id={id}>
+      {/* Фон серого цвета на всю ширину/высоту */}
+      <div className="absolute inset-0 bg-zinc-300" />
+
+      {/* Крупная цифра (id) слева, по центру вертикали */}
+      <div className="absolute left-3 top-1/2 -translate-y-1/2 font-['Intro_Book'] text-5xl leading-none text-black">
+        {id}
       </div>
-      <span className="text-sm text-gray-500">→</span>
+
+      {/* Надпись QUIZ #... немного правее цифры, по центру вертикали */}
+      <div className="absolute left-14 top-1/2 -translate-y-1/2 font-['Intro_Book'] text-xl font-normal leading-snug text-black">
+        {`QUIZ #${id}`}
+      </div>
+
+      {/* Статус (completed, locked, →) прижат к правому краю, по центру вертикали */}
+      <div className="absolute right-4 top-1/2 -translate-y-1/2 text-right font-['Intro_Book'] text-base font-normal leading-snug text-black">
+        {statusText}
+      </div>
     </div>
   )
 }

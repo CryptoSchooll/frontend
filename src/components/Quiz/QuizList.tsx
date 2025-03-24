@@ -90,18 +90,33 @@ const QuizList: React.FC = () => {
   return (
     <div className="w-full">
       <div className="flex w-full flex-col space-y-2">
-        {quizzes.map((quiz) => (
-          <div key={quiz.id} onClick={() => handleQuizClick(quiz.id)}>
-            <QuizItem
-              correctAnswers={quiz.correctAnswers}
-              id={quiz.id}
-              isAvailable={quiz.isAvailable}
-              solved={quiz.solved}
-              tasksCount={quiz.tasksCount}
-              title={quiz.title}
-            />
-          </div>
-        ))}
+        {quizzes.map((quiz) => {
+          const isDisabled = !quiz.isAvailable || quiz.solved
+
+          return (
+            <div
+              key={quiz.id}
+              onClick={() => {
+                // Не даём кликать по заблокированным или прорешенным квизам
+                if (isDisabled) return
+                handleQuizClick(quiz.id)
+              }}
+              // Пример Tailwind-классов для визуального отключения
+              className={`${
+                isDisabled ? "pointer-events-none opacity-50" : "cursor-pointer"
+              }`}
+            >
+              <QuizItem
+                correctAnswers={quiz.correctAnswers}
+                id={quiz.id}
+                isAvailable={quiz.isAvailable}
+                solved={quiz.solved}
+                tasksCount={quiz.tasksCount}
+                title={quiz.title}
+              />
+            </div>
+          )
+        })}
       </div>
 
       {/* Если выбран квиз и нет сохранённого прогресса, показываем окно подтверждения нового запуска */}
