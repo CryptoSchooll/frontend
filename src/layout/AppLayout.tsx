@@ -41,7 +41,7 @@ const AppLayout: React.FC = () => {
       </header>
 
       {/* Основное содержимое страницы с отступами, чтобы не пересекаться с хедером и навбаром */}
-      <main className="pb-16 pt-16">{pageContent}</main>
+      <main className="mt-24">{pageContent}</main>
 
       {/* Фиксированный нижний навбар */}
       <footer className="fixed bottom-0 left-0 right-0 z-10 bg-white p-4 shadow">

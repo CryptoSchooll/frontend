@@ -1,8 +1,8 @@
-import type React from "react"
+import type { FC } from "react"
 
 import { useEffect, useState } from "react"
 
-import { useQuizStore } from "../../hooks/quizStore"
+import { useQuizStore } from "@/hooks/quizStore"
 
 interface Option {
   id: string
@@ -79,7 +79,7 @@ interface QuizBoxProps {
   onClose: () => void // Вызывается при нажатии кнопки "Забрать награду"
 }
 
-const QuizBox: React.FC<QuizBoxProps> = ({ quizId, onClose }) => {
+const QuizBox: FC<QuizBoxProps> = ({ quizId, onClose }) => {
   const {
     progress,
     setProgress,

@@ -1,5 +1,5 @@
 import { create } from "zustand"
-import { persist, StateStorage } from "zustand/middleware"
+import { persist } from "zustand/middleware"
 
 export interface Quiz {
   id: string
@@ -71,8 +71,8 @@ export const useQuizStore = create<QuizStore>()(
           ]
           await new Promise((resolve) => setTimeout(resolve, 1000))
           set({ quizzes: quizzesData })
-        } catch (err: any) {
-          set({ error: err.message })
+        } catch (err: unknown) {
+          set({ error: (err as Error).message })
         } finally {
           set({ loading: false })
         }

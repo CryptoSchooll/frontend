@@ -1,6 +1,6 @@
-import type React from "react"
+import type { FC } from "react"
 
-const UserHeader: React.FC = () => {
+const UserHeader: FC = () => {
   return (
     <div className="mb-4 flex w-full items-center justify-between">
       <div className="flex items-center space-x-2">
