@@ -30,26 +30,45 @@ const pos: Record<
   },
 }
 
-const Home = () => {
-  const data = [
-    {
-      startX: 0,
-      startY: 0,
-      endX: 0,
-      endY: -1,
-      direction: "down",
-      classes: [],
-    },
-    {
-      startX: 0,
-      startY: -1,
-      endX: 1,
-      endY: -1,
-      direction: "right",
-      classes: [],
-    },
-  ]
+type Class = {
+  id: string
+  position: number
+}
 
+type Corridor = {
+  id: string
+  cost: number
+  corridorNumber: number
+  startX: number
+  startY: number
+  endX: number
+  endY: number
+  direction: "up" | "down" | "left" | "right"
+  connected: boolean
+  classes: Class[]
+}
+
+const data: Corridor[] = [
+  {
+    id: "1",
+    startX: 0,
+    startY: 0,
+    endX: 0,
+    endY: -1,
+    direction: "down",
+    connected: false,
+    corridorNumber: 1,
+    cost: 1000,
+    classes: [
+      {
+        id: "10",
+        position: 1,
+      },
+    ],
+  },
+]
+
+const Home = () => {
   return (
     <div className="h-full">
       <Camera>
