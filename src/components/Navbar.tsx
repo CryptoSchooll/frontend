@@ -1,4 +1,4 @@
-import usePage from "../hooks/usePage"
+import usePage from "@/hooks/usePage"
 
 const Navbar = () => {
   const { switchPage } = usePage()

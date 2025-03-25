@@ -1,4 +1,5 @@
 import Camera from "../components/core/Camera"
+import CameraPortal from "../components/core/CameraPortal"
 
 const pos: Record<
   string,
@@ -70,34 +71,36 @@ const data: Corridor[] = [
 
 const Home = () => {
   return (
-    <div className="h-full">
-      <Camera>
-        <div className="relative size-[1200px] bg-green-400">
-          {data.map((corridor, i) => {
-            const posMeta = pos[corridor.direction]
+    <div className="relative h-full">
+      <CameraPortal>
+        <Camera>
+          <div className="relative size-[1200px] bg-green-400">
+            {data.map((corridor, i) => {
+              const posMeta = pos[corridor.direction]
 
-            return (
-              <div
-                key={i}
-                className="z-1 absolute h-[20px] w-[200px] bg-amber-400"
-                style={{
-                  top: `${(3 + -corridor.startY) * 200 - 10 + posMeta.top}px`,
-                  left: `${(3 + corridor.startX) * 200 + posMeta.left}px`,
-                  transform: `rotate(${posMeta.rotate}deg)`,
-                }}
-              ></div>
-            )
-          })}
-          <div className="absolute top-0 grid size-full grid-cols-6 grid-rows-6 bg-green-400">
-            {Array.from({ length: 36 }).map((_, index) => (
-              <div
-                key={index}
-                className="size-full border border-green-500 bg-black"
-              />
-            ))}
+              return (
+                <div
+                  key={i}
+                  className="z-1 absolute h-[20px] w-[200px] bg-amber-400"
+                  style={{
+                    top: `${(3 + -corridor.startY) * 200 - 10 + posMeta.top}px`,
+                    left: `${(3 + corridor.startX) * 200 + posMeta.left}px`,
+                    transform: `rotate(${posMeta.rotate}deg)`,
+                  }}
+                ></div>
+              )
+            })}
+            <div className="absolute top-0 grid size-full grid-cols-6 grid-rows-6 bg-green-400">
+              {Array.from({ length: 36 }).map((_, index) => (
+                <div
+                  key={index}
+                  className="size-full border border-green-500 bg-black"
+                />
+              ))}
+            </div>
           </div>
-        </div>
-      </Camera>
+        </Camera>
+      </CameraPortal>
     </div>
   )
 }
