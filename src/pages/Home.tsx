@@ -33,15 +33,14 @@ const corridorPosition: Record<
   },
 }
 
-const classPosition: Record<
-  number,
-  {
-    top?: string
-    left?: string
-    right?: string
-    bottom?: string
-  }
-> = {
+type PositionRecord = {
+  top?: string
+  left?: string
+  right?: string
+  bottom?: string
+}
+
+const classPosition: Record<number, PositionRecord> = {
   1: {
     bottom: "0px",
     left: "110px",
@@ -60,18 +59,38 @@ const classPosition: Record<
   },
 }
 
+const buttonsPosition: Record<Direction, PositionRecord> = {
+  up: {
+    left: "3px",
+    top: "-40px",
+  },
+  down: {
+    left: "3px",
+    bottom: "-40px",
+  },
+  left: {
+    top: "3px",
+    left: "-40px",
+  },
+  right: {
+    top: "3px",
+    right: "-40px",
+  },
+}
+
+const directions: Direction[] = ["up", "down", "left", "right"]
 const opositeDirections: Record<Direction, Direction> = {
   up: "down",
   down: "up",
   left: "right",
   right: "left",
 }
-const directions: Direction[] = ["up", "down", "left", "right"]
 
 const Corridor = ({
   corridorData,
   appendClass,
   addCorridor,
+  filled,
 }: {
   corridorData: Corridor
   appendClass: (corridorId: string, position: number) => void
@@ -80,15 +99,9 @@ const Corridor = ({
     direction: Direction,
     position: "start" | "end",
   ) => void
+  filled: boolean
 }) => {
   const posMeta = corridorPosition[corridorData.direction]
-  const isFull = isCorridorFull(corridorData)
-  const possibleDirectionsStart = directions.filter(
-    (dir) => dir !== corridorData.direction,
-  )
-  const possibleDirectionsEnd = directions.filter(
-    (dir) => opositeDirections[dir] !== corridorData.direction,
-  )
 
   return (
     <div
@@ -99,41 +112,51 @@ const Corridor = ({
         transform: `rotate(${posMeta.rotate})`,
       }}
     >
-      {isFull && (
-        <div
-          className="absolute left-[-50px] top-0 flex flex-col gap-1"
-          style={{
-            transform: `rotate(${-parseFloat(posMeta.rotate)}deg)`,
-          }}
-        >
-          {possibleDirectionsStart.map((direction) => (
-            <button
-              key={`start-${direction}`}
-              className="size-8 rounded bg-green-500 text-white"
-              onClick={() => addCorridor(corridorData.id, direction, "start")}
-            >
-              {direction[0].toUpperCase()}
-            </button>
-          ))}
+      {filled && (
+        <div className="relative">
+          <div
+            className="absolute size-[40px]"
+            style={{
+              transform: `rotate(${-parseFloat(posMeta.rotate)}deg)`,
+            }}
+          >
+            {corridorData.availableDirectionsStart.map((direction) => (
+              <button
+                key={`start-${direction}`}
+                className="absolute size-8 rounded bg-green-500 text-white"
+                style={{
+                  ...buttonsPosition[direction],
+                }}
+                onClick={() => addCorridor(corridorData.id, direction, "start")}
+              >
+                {direction[0].toUpperCase()}
+              </button>
+            ))}
+          </div>
         </div>
       )}
 
-      {isFull && (
-        <div
-          className="absolute right-[-50px] top-0 flex flex-col gap-1"
-          style={{
-            transform: `rotate(${-parseFloat(posMeta.rotate)}deg)`,
-          }}
-        >
-          {possibleDirectionsEnd.map((direction) => (
-            <button
-              key={`end-${direction}`}
-              className="size-8 rounded bg-green-500 text-white"
-              onClick={() => addCorridor(corridorData.id, direction, "end")}
-            >
-              {direction[0].toUpperCase()}
-            </button>
-          ))}
+      {filled && (
+        <div className="relative">
+          <div
+            className="absolute right-0 size-[40px]"
+            style={{
+              transform: `rotate(${-parseFloat(posMeta.rotate)}deg)`,
+            }}
+          >
+            {corridorData.availableDirectionsEnd.map((direction) => (
+              <button
+                key={`start-${direction}`}
+                className="absolute size-8 rounded bg-green-500 text-white"
+                style={{
+                  ...buttonsPosition[direction],
+                }}
+                onClick={() => addCorridor(corridorData.id, direction, "end")}
+              >
+                {direction[0].toUpperCase()}
+              </button>
+            ))}
+          </div>
         </div>
       )}
 
@@ -209,7 +232,7 @@ const validateClasses = (classes: Class[]) => {
 }
 
 const Home = () => {
-  const { corridors, appendClass, addCorridor } = useGameStore()
+  const { corridors, appendClass, addCorridor, filled } = useGameStore()
   console.log(corridors)
   return (
     <div className="relative h-full">
@@ -222,6 +245,7 @@ const Home = () => {
                 addCorridor={addCorridor}
                 appendClass={appendClass}
                 corridorData={corridor}
+                filled={filled}
               />
             ))}
             <div className="absolute top-0 grid size-full grid-cols-6 grid-rows-6 bg-green-400">
@@ -237,10 +261,6 @@ const Home = () => {
       </CameraPortal>
     </div>
   )
-}
-
-const isCorridorFull = (corridor: Corridor) => {
-  return corridor.classes.length === 4
 }
 
 export default Home

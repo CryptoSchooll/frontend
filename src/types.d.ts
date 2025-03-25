@@ -16,4 +16,7 @@ type Corridor = {
   direction: Direction
   connected: boolean
   classes: Class[]
+  availableDirectionsStart: Direction[]
+  availableDirectionsEnd: Direction[]
+  multi: boolean
 }
