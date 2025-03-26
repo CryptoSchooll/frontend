@@ -26,9 +26,8 @@ export interface QuizSubmitResponse {
   correctAnswerIds: string[]
 }
 
-// Заглушка для загрузки вопросов (например, GET /api/v1/quizzes/{quizId}/questions)
 const fetchQuizQuestions = async (quizId: string): Promise<Question[]> => {
-  await new Promise((resolve) => setTimeout(resolve, 500)) // имитация задержки
+  await new Promise((resolve) => setTimeout(resolve, 500))
   return [
     {
       id: "q1",
@@ -52,11 +51,9 @@ const fetchQuizQuestions = async (quizId: string): Promise<Question[]> => {
         { id: "a8", text: "Мадрид" },
       ],
     },
-    // Можно добавить дополнительные вопросы
   ]
 }
 
-// Заглушка для отправки результатов викторины (POST /api/v1/quizzes/{quizId}/submit)
 const submitQuizAnswers = async (
   quizId: string,
   answers: any,
@@ -90,6 +87,7 @@ const QuizBox: FC<QuizBoxProps> = ({ quizId, onClose }) => {
   const [questions, setQuestions] = useState<Question[]>([])
   const [submitting, setSubmitting] = useState(false)
   const [result, setResult] = useState<QuizSubmitResponse | null>(null)
+  const [timeLeft, setTimeLeft] = useState(0)
 
   // При монтировании загружаем вопросы и инициализируем прогресс, если его ещё нет
   useEffect(() => {
@@ -108,17 +106,37 @@ const QuizBox: FC<QuizBoxProps> = ({ quizId, onClose }) => {
     init()
   }, [quizId, progress, setProgress])
 
-  // Берём индекс текущего вопроса из сохранённого прогресса
   const currentIndex = progress?.currentQuestionIndex || 0
+  const currentQuestion = questions[currentIndex]
+
+  // Обновление оставшегося времени для текущего вопроса
+  useEffect(() => {
+    if (!progress || !currentQuestion) return
+
+    const questionStart = progress.questionStartedAt
+    const limit = currentQuestion.timeLimit
+
+    const interval = setInterval(() => {
+      const elapsed = (Date.now() - questionStart) / 1000
+      const remaining = Math.max(limit - elapsed, 0)
+      setTimeLeft(remaining)
+      if (remaining === 0) {
+        clearInterval(interval)
+        // Автоматически засчитываем вопрос как неправильный, вызывая handleAnswer с пустым значением
+        handleAnswer("")
+      }
+    }, 100)
+
+    return () => clearInterval(interval)
+  }, [progress, currentQuestion])
 
   const handleAnswer = (answerId: string) => {
-    if (!progress) return
+    if (!progress || !currentQuestion) return
     const now = Date.now()
     const answerTimeSeconds = (now - progress.questionStartedAt) / 1000
-    const currentQuestion = questions[currentIndex]
     const newAnswer = {
       questionId: currentQuestion.id,
-      answerId,
+      answerId, // Если answerId пустой, значит пользователь не успел ответить
       answerTime: answerTimeSeconds,
     }
 
@@ -127,7 +145,6 @@ const QuizBox: FC<QuizBoxProps> = ({ quizId, onClose }) => {
     if (currentIndex < questions.length - 1) {
       newIndex = currentIndex + 1
     }
-    // Обновляем прогресс в store
     setProgress({
       currentQuestionIndex: newIndex,
       answers: newAnswers,
@@ -135,7 +152,6 @@ const QuizBox: FC<QuizBoxProps> = ({ quizId, onClose }) => {
       questionStartedAt: Date.now(),
     })
 
-    // Если это был последний вопрос — отправляем ответы
     if (currentIndex >= questions.length - 1) {
       handleSubmitQuiz(newAnswers, progress.quizStartedAt)
     }
@@ -147,20 +163,22 @@ const QuizBox: FC<QuizBoxProps> = ({ quizId, onClose }) => {
     try {
       const resp = await submitQuizAnswers(quizId, answers, totalTime)
       setResult(resp)
-      setQuizFinished(true) // Устанавливаем флаг завершения викторины
+      setQuizFinished(true)
     } catch (err) {
       console.error("Ошибка при отправке викторины:", err)
     } finally {
       setSubmitting(false)
-      // Сохраняем результат, а сброс состояния оставляем на onClose
     }
   }
+
+  const timePercentage = currentQuestion
+    ? Math.round((timeLeft / currentQuestion.timeLimit) * 100)
+    : 0
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-gray-900/40">
       <div className="relative w-full max-w-lg rounded-md bg-white p-4 shadow-lg">
         {result ? (
-          // Отображаем результаты викторины и кнопку "Забрать награду"
           <div>
             <h2 className="mb-2 text-xl font-bold">Результаты</h2>
             <p>
@@ -173,7 +191,6 @@ const QuizBox: FC<QuizBoxProps> = ({ quizId, onClose }) => {
             <button
               className="mt-4 rounded bg-blue-500 px-4 py-2 text-white"
               onClick={() => {
-                // При закрытии викторины сбрасываем состояние, чтобы модальное окно "Продолжить викторину?" не появлялось снова
                 onClose()
                 clearProgress()
                 clearSelection()
@@ -187,14 +204,28 @@ const QuizBox: FC<QuizBoxProps> = ({ quizId, onClose }) => {
         ) : submitting ? (
           <div>Отправка ответов...</div>
         ) : (
-          // Отображаем текущий вопрос и варианты ответов
           <>
+            {/* Таймер-бар */}
+            <div className="mb-4">
+              <div className="h-2 w-full rounded bg-gray-200">
+                <div
+                  className="h-2 rounded bg-blue-500"
+                  style={{
+                    width: `${timePercentage}%`,
+                    transition: "width 0.1s linear",
+                  }}
+                ></div>
+              </div>
+              <p className="mt-1 text-sm text-gray-600">
+                Осталось времени: {timeLeft.toFixed(1)} сек.
+              </p>
+            </div>
             <h2 className="mb-2 text-xl font-bold">
               Вопрос {currentIndex + 1} / {questions.length}
             </h2>
-            <p className="mb-4">{questions[currentIndex].text}</p>
+            <p className="mb-4">{currentQuestion.text}</p>
             <ul className="space-y-2">
-              {questions[currentIndex].options.map((opt) => (
+              {currentQuestion.options.map((opt) => (
                 <li key={opt.id}>
                   <button
                     className="rounded bg-gray-300 px-4 py-2"

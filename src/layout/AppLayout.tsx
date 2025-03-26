@@ -36,7 +36,7 @@ const AppLayout: React.FC = () => {
   return (
     <div className="relative min-h-screen">
       {/* Фиксированный хедер без фона и лишних отступов */}
-      <header className="fixed left-0 right-0 top-4 z-10">
+      <header className="fixed left-0 right-0 top-0 z-10">
         <UserHeader />
       </header>
 
@@ -44,7 +44,7 @@ const AppLayout: React.FC = () => {
       <main className="mt-24">{pageContent}</main>
 
       {/* Фиксированный нижний навбар (если нужен именно фиксированный) */}
-      <footer className="fixed bottom-0 left-0 right-0 z-10 bg-white p-4 shadow">
+      <footer className="bg-black shadow">
         <Navbar />
       </footer>
     </div>
