@@ -1,22 +1,33 @@
-import { useState } from "react"
+import { Camera, CameraPortal, Corridor } from "@core"
 
-import Camera from "../components/core/Camera"
-import CameraPortal from "../components/core/CameraPortal"
+import { useGameStore } from "@/hooks/gameStore"
+
+const Grid = () => (
+  <div className="absolute top-0 grid size-full grid-cols-6 grid-rows-6 bg-cyan-400">
+    {Array.from({ length: 36 }).map((_, index) => (
+      <div key={index} className="size-full border border-cyan-500 bg-black" />
+    ))}
+  </div>
+)
 
 const Home = () => {
-  const [count, setCount] = useState(0)
+  const { corridors, appendClass, addCorridor, filled } = useGameStore()
   return (
-    <div className="relative h-full">
+    <div className="relative h-screen bg-black">
       <CameraPortal>
         <Camera>
-          <div
-            className="flex h-[300px] w-[400px] flex-col items-center justify-center bg-green-500 bg-opacity-50"
-            style={{ transform: "scale(1)" }}
-          >
-            <h2 className="text-xl font-bold">Core gameplay</h2>
-            <p>{count}</p>
-            <button onClick={() => setCount((prev) => prev + 1)}>click</button>
+          <div className="relative size-[2400px] bg-cyan-700">
+            {corridors.map((corridor, i) => (
+              <Corridor
+                key={i}
+                corridorData={corridor}
+                isFilled={filled}
+                onAddCorridor={addCorridor}
+                onAppendClass={appendClass}
+              />
+            ))}
           </div>
+          <Grid />
         </Camera>
       </CameraPortal>
     </div>
