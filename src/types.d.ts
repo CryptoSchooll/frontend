@@ -1,7 +1,20 @@
+type Position = 1 | 2 | 3 | 4
+
 type Class = {
   id: string
-  position: number
+  position: Position
 }
+
+type ClassLike =
+  | {
+      isClass: boolean
+      id: string
+      position: Position
+    }
+  | {
+      position: Position
+      isClass: boolean
+    }
 
 type Direction = "up" | "down" | "left" | "right"
 
@@ -14,9 +27,7 @@ type Corridor = {
   endX: number
   endY: number
   direction: Direction
-  connected: boolean
   classes: Class[]
   availableDirectionsStart: Direction[]
   availableDirectionsEnd: Direction[]
-  multi: boolean
 }

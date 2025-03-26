@@ -1,11 +1,11 @@
 import { create } from "zustand"
 
-const DIRECTIONS = ["up", "down", "left", "right"] as const
+import { DIRECTIONS, OPOSITE_DIRECTIONS } from "@/constants"
 
-type GameStore = {
+export type GameStore = {
   corridors: Corridor[]
   filled: boolean
-  appendClass: (corridorId: string, position: number) => void
+  appendClass: (corridorId: string, position: Position) => void
   addCorridor: (
     previousCorridorId: string,
     direction: Direction,
@@ -22,19 +22,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
       endX: 1,
       endY: 0,
       direction: "right",
-      connected: false,
       corridorNumber: 1,
       cost: 1000,
       classes: [],
       availableDirectionsStart: ["up", "down", "left"],
       availableDirectionsEnd: ["up", "down", "right"],
-      multi: true,
     },
   ],
 
   filled: false,
 
-  appendClass: (corridorId, position) =>
+  appendClass: (corridorId: string, position: Position) =>
     set((state) => {
       let filled = false
       const updatedCorridors = state.corridors.map((corridor) => {
@@ -51,7 +49,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
           return corridor
         }
 
-        // Generate a new unique ID for the class
         const newClassId = crypto.randomUUID()
         const classes = [
           ...corridor.classes,
@@ -60,10 +57,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
             position: position,
           },
         ]
-
         if (classes.length === 4) filled = true
 
-        // Add the new class to the corridor
         return {
           ...corridor,
           classes,
@@ -92,9 +87,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const isValidDirection =
       position === "start"
         ? previousCorridor.availableDirectionsStart.includes(direction) &&
-        previousCorridor.direction !== direction
+          previousCorridor.direction !== direction
         : previousCorridor.availableDirectionsEnd.includes(direction) &&
-        opositeDirections[previousCorridor.direction] !== direction
+          OPOSITE_DIRECTIONS[previousCorridor.direction] !== direction
 
     if (!isValidDirection) {
       console.warn(`Direction ${direction} is not available for this corridor`)
@@ -107,34 +102,34 @@ export const useGameStore = create<GameStore>((set, get) => ({
       position,
     )
 
-    console.log(previousCorridor, newCorridor)
+    set((state) => {
+      const updatedCorridors = state.corridors.map((corridor) => {
+        if (corridor.id !== previousCorridorId) return corridor
 
-    set((state) => ({
-      corridors: [
-        ...state.corridors.map((corridor) =>
-          corridor.id === previousCorridorId
-            ? {
-              ...corridor,
-              availableDirectionsStart:
-                corridor.multi && position === "start"
-                  ? corridor.availableDirectionsStart.filter(
-                    (dir) => dir !== direction,
-                  )
-                  : corridor.availableDirectionsStart,
-              availableDirectionsEnd:
-                position === "end"
-                  ? corridor.availableDirectionsEnd.filter(
-                    (dir) => dir !== direction,
-                  )
-                  : corridor.availableDirectionsEnd,
-              connected: true,
-            }
-            : corridor,
-        ),
-        newCorridor,
-      ],
-      filled: false,
-    }))
+        const newDirectionsStart =
+          position === "start"
+            ? corridor.availableDirectionsStart.filter(
+                (dir) => dir !== direction,
+              )
+            : corridor.availableDirectionsStart
+
+        const newDirectionsEnd =
+          position === "end"
+            ? corridor.availableDirectionsEnd.filter((dir) => dir !== direction)
+            : corridor.availableDirectionsEnd
+
+        return {
+          ...corridor,
+          availableDirectionsStart: newDirectionsStart,
+          availableDirectionsEnd: newDirectionsEnd,
+        }
+      })
+
+      return {
+        corridors: [...updatedCorridors, newCorridor],
+        filled: false,
+      }
+    })
   },
 }))
 
@@ -203,21 +198,12 @@ const generateNewCorridor = (
     endX: newEndX,
     endY: newEndY,
     direction: direction,
-    connected: true,
     corridorNumber: previousCorridor.corridorNumber + 1,
     cost: 1000,
     classes: [],
-    multi: false,
     availableDirectionsStart: [],
     availableDirectionsEnd: DIRECTIONS.filter(
-      (dir) => dir !== opositeDirections[direction],
+      (dir) => dir !== OPOSITE_DIRECTIONS[direction],
     ),
   }
-}
-
-const opositeDirections: Record<Direction, Direction> = {
-  up: "down",
-  down: "up",
-  left: "right",
-  right: "left",
 }
