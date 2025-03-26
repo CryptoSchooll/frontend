@@ -9,7 +9,7 @@ export type GameStore = {
   addCorridor: (
     previousCorridorId: string,
     direction: Direction,
-    position: "start" | "end",
+    side: Side,
   ) => void
 }
 
@@ -68,7 +68,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return { corridors: updatedCorridors, filled }
     }),
 
-  addCorridor: (previousCorridorId, direction, position) => {
+  addCorridor: (previousCorridorId, direction, side) => {
     const state = get()
     const previousCorridor = state.corridors.find(
       (corridor) => corridor.id === previousCorridorId,
@@ -85,44 +85,78 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
 
     const isValidDirection =
-      position === "start"
+      side === "start"
         ? previousCorridor.availableDirectionsStart.includes(direction) &&
-          previousCorridor.direction !== direction
+        previousCorridor.direction !== direction
         : previousCorridor.availableDirectionsEnd.includes(direction) &&
-          OPOSITE_DIRECTIONS[previousCorridor.direction] !== direction
+        OPOSITE_DIRECTIONS[previousCorridor.direction] !== direction
 
     if (!isValidDirection) {
       console.warn(`Direction ${direction} is not available for this corridor`)
       return
     }
 
-    const newCorridor = generateNewCorridor(
-      previousCorridor,
-      direction,
-      position,
+    const newCorridor = generateNewCorridor(previousCorridor, direction, side)
+
+    const connCorridorEnd = state.corridors.find(
+      (corridor) =>
+        corridor.endX === newCorridor.endX &&
+        corridor.endY === newCorridor.endY,
     )
+    if (connCorridorEnd) {
+      newCorridor.availableDirectionsEnd = []
+    }
+
+    const connCorridorStart = state.corridors.find(
+      (corridor) =>
+        corridor.startX === newCorridor.endX &&
+        corridor.startY === newCorridor.endY,
+    )
+    if (connCorridorStart) {
+      newCorridor.availableDirectionsEnd = []
+    }
 
     set((state) => {
       const updatedCorridors = state.corridors.map((corridor) => {
-        if (corridor.id !== previousCorridorId) return corridor
-
-        const newDirectionsStart =
-          position === "start"
-            ? corridor.availableDirectionsStart.filter(
+        if (corridor.id === previousCorridorId) {
+          const newDirectionsStart =
+            side === "start"
+              ? corridor.availableDirectionsStart.filter(
                 (dir) => dir !== direction,
               )
-            : corridor.availableDirectionsStart
+              : corridor.availableDirectionsStart
 
-        const newDirectionsEnd =
-          position === "end"
-            ? corridor.availableDirectionsEnd.filter((dir) => dir !== direction)
-            : corridor.availableDirectionsEnd
+          const newDirectionsEnd =
+            side === "end"
+              ? corridor.availableDirectionsEnd.filter(
+                (dir) => dir !== direction,
+              )
+              : corridor.availableDirectionsEnd
 
-        return {
-          ...corridor,
-          availableDirectionsStart: newDirectionsStart,
-          availableDirectionsEnd: newDirectionsEnd,
-        }
+          return {
+            ...corridor,
+            availableDirectionsStart: newDirectionsStart,
+            availableDirectionsEnd: newDirectionsEnd,
+          }
+        } else if (connCorridorEnd?.id === corridor.id) {
+          const newCorridorEnd = corridor.availableDirectionsEnd.filter(
+            (dir) => dir !== OPOSITE_DIRECTIONS[direction],
+          )
+
+          return {
+            ...corridor,
+            availableDirectionsEnd: newCorridorEnd,
+          }
+        } else if (connCorridorStart?.id === corridor.id) {
+          const newCorridorStart = corridor.availableDirectionsStart.filter(
+            (dir) => dir !== OPOSITE_DIRECTIONS[direction],
+          )
+
+          return {
+            ...corridor,
+            availableDirectionsStart: newCorridorStart,
+          }
+        } else return corridor
       })
 
       return {
@@ -136,14 +170,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
 const generateNewCorridor = (
   previousCorridor: Corridor,
   direction: Direction,
-  position: "start" | "end",
+  side: Side,
 ): Corridor => {
   let newStartX = previousCorridor.startX
   let newStartY = previousCorridor.startY
   let newEndX = previousCorridor.startX
   let newEndY = previousCorridor.startY
 
-  if (position === "start") {
+  if (side === "start") {
     switch (direction) {
       case "right":
         newStartX = previousCorridor.startX

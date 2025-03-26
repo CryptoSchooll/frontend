@@ -5,7 +5,7 @@ export const OPOSITE_DIRECTIONS = {
   down: "up",
   left: "right",
   right: "left",
-}
+} as const
 
 export const CORRIDOR_POSITIONS = {
   right: { rotate: "0deg", top: 0, left: 0 },

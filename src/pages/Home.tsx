@@ -1,6 +1,4 @@
-import Camera from "@core/Camera"
-import CameraPortal from "@core/CameraPortal"
-import Corridor from "@core/Corridor"
+import { Camera, CameraPortal, Corridor } from "@core"
 
 import { useGameStore } from "@/hooks/gameStore"
 
