@@ -1,13 +1,6 @@
-import type React from "react"
-
-import Navbar from "../components/Navbar"
-import UserHeader from "../components/UserHeader"
-import usePage from "../hooks/usePage"
-import Broadcast from "../pages/Broadcast"
-import Club from "../pages/Club"
-import Home from "../pages/Home"
-import Quizzes from "../pages/Quizzes"
-import Tasks from "../pages/Tasks"
+import { Navbar, UserHeader } from "@/components"
+import usePage from "@/hooks/usePage"
+import { Broadcast, Clans, Home, Quizzes, Club } from "@/pages"
 
 const AppLayout: React.FC = () => {
   const { currentPage } = usePage()
@@ -41,7 +34,9 @@ const AppLayout: React.FC = () => {
       </header>
 
       {/* Основное содержимое страницы с отступами, чтобы не пересекаться с хедером и навбаром */}
-      <main className="mt-24">{pageContent}</main>
+      <main className={currentPage !== "home" ? "mt-24" : undefined}>
+        {pageContent}
+      </main>
 
       {/* Фиксированный нижний навбар (если нужен именно фиксированный) */}
       <footer className="bg-black shadow">

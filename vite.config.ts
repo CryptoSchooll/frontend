@@ -8,6 +8,7 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": "/src",
+      "@core": "/src/components/core",
     },
   },
   server: {
