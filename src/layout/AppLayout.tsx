@@ -4,7 +4,7 @@ import Navbar from "../components/Navbar"
 import UserHeader from "../components/UserHeader"
 import usePage from "../hooks/usePage"
 import Broadcast from "../pages/Broadcast"
-import Clans from "../pages/Clans"
+import Club from "../pages/Club"
 import Home from "../pages/Home"
 import Quizzes from "../pages/Quizzes"
 import Tasks from "../pages/Tasks"
@@ -26,8 +26,8 @@ const AppLayout: React.FC = () => {
     case "tasks":
       pageContent = <Tasks />
       break
-    case "clans":
-      pageContent = <Clans />
+    case "club":
+      pageContent = <Club />
       break
     default:
       pageContent = <div>Страница не найдена</div>

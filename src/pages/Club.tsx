@@ -1,5 +1,5 @@
 const Clans = () => {
-  return <div>clans</div>
+  return <div>club</div>
 }
 
 export default Clans
