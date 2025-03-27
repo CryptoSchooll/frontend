@@ -1,36 +1,23 @@
-import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from "@/components/ui/Drawer"
+import type { FC } from "react";
+import TaskList from "../components/Tasks/TaskList"; // <-- Измените путь, если TaskList лежит в другой папке
 
-const Tasks = () => {
+/**
+ * Компонент страницы для отображения списка задач.
+ */
+const TasksPage: FC = () => {
   return (
-    <div>
-      <Drawer>
-        <DrawerTrigger>Open</DrawerTrigger>
-        <DrawerContent>
-          <DrawerHeader className="text-white">
-            <DrawerTitle>Are you absolutely sure?</DrawerTitle>
-            <DrawerDescription>This action cannot be undone.</DrawerDescription>
-          </DrawerHeader>
-          <DrawerFooter className="text-white">
-            <button>Submit</button>
-            <DrawerClose>
-              <button type="button" onClick={console.log("close")}>
-                cancel
-              </button>
-            </DrawerClose>
-          </DrawerFooter>
-        </DrawerContent>
-      </Drawer>
-    </div>
-  )
-}
+    // Используем те же стили для основного контейнера страницы,
+    // что и в Quizzes для консистентности.
+    <div className="relative mx-auto flex min-h-screen w-full max-w-md flex-col items-center bg-gray-50 p-4">
+      {/* Заголовок страницы (опционально) */}
+      <h1 className="text-2xl font-bold mb-6 text-zinc-800">Tasks</h1> {/* Пример заголовка */}
 
-export default Tasks
+      {/* Рендерим компонент списка задач */}
+      <TaskList />
+
+      {/* Здесь можно добавить другие элементы страницы при необходимости */}
+    </div>
+  );
+};
+
+export default TasksPage;
