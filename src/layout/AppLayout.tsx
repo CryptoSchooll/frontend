@@ -1,6 +1,6 @@
 import { Navbar, UserHeader } from "@/components"
 import usePage from "@/hooks/usePage"
-import { Broadcast, Clans, Home, Quizzes, Club } from "@/pages"
+import { Broadcast, Tasks, Home, Quizzes, Club } from "@/pages"
 
 const AppLayout: React.FC = () => {
   const { currentPage } = usePage()
