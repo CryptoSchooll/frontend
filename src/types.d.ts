@@ -5,18 +5,17 @@ type Side = "start" | "end"
 type Class = {
   id: string
   position: Position
+  name: string
 }
 
 type ClassLike =
+  | ({
+      isClass: true
+    } & Class)
   | {
-    isClass: boolean
-    id: string
-    position: Position
-  }
-  | {
-    position: Position
-    isClass: boolean
-  }
+      position: Position
+      isClass: false
+    }
 
 type Direction = "up" | "down" | "left" | "right"
 

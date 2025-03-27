@@ -27,3 +27,47 @@ export const BUTTONS_POSITIONS = {
   left: { top: "3px", left: "-40px" },
   right: { top: "3px", right: "-40px" },
 }
+
+// !TEMP
+export const CLASSES = [
+  {
+    id: "class1",
+    name: "Литература",
+  },
+  {
+    id: "class2",
+    name: "Русский язык",
+  },
+  {
+    id: "class3",
+    name: "География",
+  },
+  {
+    id: "class4",
+    name: "История",
+  },
+  {
+    id: "class5",
+    name: "Математика",
+  },
+  {
+    id: "class6",
+    name: "Биология",
+  },
+  {
+    id: "class7",
+    name: "Английский",
+  },
+  {
+    id: "class8",
+    name: "Информатика",
+  },
+  {
+    id: "class9",
+    name: "Физика",
+  },
+  {
+    id: "class10",
+    name: "Химия",
+  },
+]

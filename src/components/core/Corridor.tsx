@@ -1,21 +1,18 @@
-import type { GameStore } from "@/hooks/gameStore"
-
 import { memo, useMemo } from "react"
 
 import Class from "./Class"
+import CorridorConfirm from "./CorridorConfirm"
 
 import { BUTTONS_POSITIONS, CORRIDOR_POSITIONS } from "@/constants"
 
 const ExpansionButtons = ({
   posMeta,
   directions,
-  onAddCorridor,
   corridorId,
   side,
 }: {
   posMeta: typeof CORRIDOR_POSITIONS.up
   directions: Direction[]
-  onAddCorridor: GameStore["addCorridor"]
   corridorId: string
   side: "start" | "end"
 }) => {
@@ -28,16 +25,21 @@ const ExpansionButtons = ({
         }}
       >
         {directions.map((direction) => (
-          <button
+          <CorridorConfirm
             key={`${side}-${direction}`}
-            className="absolute size-8 rounded bg-green-500 text-white"
-            style={{
-              ...BUTTONS_POSITIONS[direction],
-            }}
-            onClick={() => onAddCorridor(corridorId, direction, side)}
+            corridorId={corridorId}
+            direction={direction}
+            side={side}
           >
-            {direction[0].toUpperCase()}
-          </button>
+            <button
+              className="absolute size-8 rounded bg-green-500 text-white"
+              style={{
+                ...BUTTONS_POSITIONS[direction],
+              }}
+            >
+              {direction[0].toUpperCase()}
+            </button>
+          </CorridorConfirm>
         ))}
       </div>
     </div>
@@ -46,13 +48,9 @@ const ExpansionButtons = ({
 
 const CorridorMemo = ({
   corridorData,
-  onAddCorridor,
-  onAppendClass,
   isFilled,
 }: {
   corridorData: Corridor
-  onAddCorridor: GameStore["addCorridor"]
-  onAppendClass: GameStore["appendClass"]
   isFilled: boolean
 }) => {
   const posMeta = CORRIDOR_POSITIONS[corridorData.direction]
@@ -78,7 +76,6 @@ const CorridorMemo = ({
             directions={corridorData.availableDirectionsStart}
             posMeta={posMeta}
             side="start"
-            onAddCorridor={onAddCorridor}
           />
           <ExpansionButtons
             key="end"
@@ -86,19 +83,13 @@ const CorridorMemo = ({
             directions={corridorData.availableDirectionsEnd}
             posMeta={posMeta}
             side="end"
-            onAddCorridor={onAddCorridor}
           />
         </>
       )}
 
       <div className="relative">
         {validatedClasses.map((classData, i) => (
-          <Class
-            key={i}
-            classData={classData}
-            corridorId={corridorData.id}
-            onAppendClass={onAppendClass}
-          />
+          <Class key={i} classData={classData} corridorId={corridorData.id} />
         ))}
       </div>
     </div>
@@ -108,7 +99,7 @@ const Corridor = memo(CorridorMemo)
 export default Corridor
 
 const validateClasses = (classes: Class[]): ClassLike[] => {
-  const result = []
+  const result: ClassLike[] = []
   const exists = []
 
   for (let i = 0; i < classes.length; i++) {

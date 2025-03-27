@@ -5,7 +5,7 @@ import { DIRECTIONS, OPOSITE_DIRECTIONS } from "@/constants"
 export type GameStore = {
   corridors: Corridor[]
   filled: boolean
-  appendClass: (corridorId: string, position: Position) => void
+  appendClass: (corridorId: string, newClass: Class) => void
   addCorridor: (
     previousCorridorId: string,
     direction: Direction,
@@ -32,31 +32,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   filled: false,
 
-  appendClass: (corridorId: string, position: Position) =>
+  appendClass: (corridorId: string, newClass: Class) =>
     set((state) => {
       let filled = false
       const updatedCorridors = state.corridors.map((corridor) => {
         if (corridor.id !== corridorId) return corridor
 
         const isPositionOccupied = corridor.classes.some(
-          (cls) => cls.position === position,
+          (cls) => cls.position === newClass.position,
         )
 
         if (isPositionOccupied) {
           console.warn(
-            `Position ${position} is already occupied in corridor ${corridorId}`,
+            `Position ${newClass.position} is already occupied in corridor ${corridorId}`,
           )
           return corridor
         }
 
-        const newClassId = crypto.randomUUID()
-        const classes = [
-          ...corridor.classes,
-          {
-            id: newClassId,
-            position: position,
-          },
-        ]
+        const classes = [...corridor.classes, newClass]
         if (classes.length === 4) filled = true
 
         return {
@@ -87,9 +80,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const isValidDirection =
       side === "start"
         ? previousCorridor.availableDirectionsStart.includes(direction) &&
-        previousCorridor.direction !== direction
+          previousCorridor.direction !== direction
         : previousCorridor.availableDirectionsEnd.includes(direction) &&
-        OPOSITE_DIRECTIONS[previousCorridor.direction] !== direction
+          OPOSITE_DIRECTIONS[previousCorridor.direction] !== direction
 
     if (!isValidDirection) {
       console.warn(`Direction ${direction} is not available for this corridor`)
@@ -122,15 +115,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const newDirectionsStart =
             side === "start"
               ? corridor.availableDirectionsStart.filter(
-                (dir) => dir !== direction,
-              )
+                  (dir) => dir !== direction,
+                )
               : corridor.availableDirectionsStart
 
           const newDirectionsEnd =
             side === "end"
               ? corridor.availableDirectionsEnd.filter(
-                (dir) => dir !== direction,
-              )
+                  (dir) => dir !== direction,
+                )
               : corridor.availableDirectionsEnd
 
           return {
