@@ -1,51 +1,19 @@
 import type { FC, PropsWithChildren } from "react"
 
-import {
-  Drawer,
-  DrawerContent,
-  DrawerDescription,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from "@/components/ui/Drawer"
-import { CLASSES } from "@/constants"
-import { useGameStore } from "@/hooks/gameStore"
+import { useDrawerStore } from "@/hooks/drawerStore"
 
-const ClassShopMenu: FC<
+const ClassShopTrigger: FC<
   PropsWithChildren<{ position: Position; corridorId: string }>
 > = ({ children, position, corridorId }) => {
-  const { appendClass } = useGameStore()
+  const { openShopDrawer } = useDrawerStore((state) => state.actions)
+
+  const handleClick = () => openShopDrawer({ corridorId, position })
 
   return (
-    <Drawer>
-      <DrawerTrigger>{children}</DrawerTrigger>
-      <DrawerContent className="pb-5 text-white">
-        <DrawerHeader className="mt-4 p-0 text-white">
-          <DrawerTitle>Магазин</DrawerTitle>
-          <DrawerDescription />
-        </DrawerHeader>
-        <ul className="mt-4 px-10">
-          {CLASSES.map((classData, i) => (
-            <li key={i} className="mt-2 flex justify-between">
-              <p>{classData.name}</p>
-              <button
-                onClick={() => {
-                  const newClass: Class = {
-                    ...classData,
-                    id: crypto.randomUUID(),
-                    position,
-                  }
-                  appendClass(corridorId, newClass)
-                }}
-              >
-                Установить
-              </button>
-            </li>
-          ))}
-        </ul>
-      </DrawerContent>
-    </Drawer>
+    <button type="button" onClick={handleClick}>
+      {children}
+    </button>
   )
 }
 
-export default ClassShopMenu
+export default ClassShopTrigger

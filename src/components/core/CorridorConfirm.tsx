@@ -1,43 +1,19 @@
 import type { FC, PropsWithChildren } from "react"
 
-import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from "@/components/ui/Drawer"
-import { useGameStore } from "@/hooks/gameStore"
+import { useDrawerStore } from "@/hooks/drawerStore"
 
-const CorridorConfirm: FC<
+const CorridorConfirmTrigger: FC<
   PropsWithChildren<{ corridorId: string; direction: Direction; side: Side }>
 > = ({ children, direction, side, corridorId }) => {
-  const { addCorridor } = useGameStore()
+  const { openConfirmDrawer } = useDrawerStore((state) => state.actions)
+
+  const handleClick = () => openConfirmDrawer({ corridorId, direction, side })
 
   return (
-    <Drawer>
-      <DrawerTrigger>{children}</DrawerTrigger>
-      <DrawerContent className="pb-5 text-white">
-        <DrawerHeader className="mt-4 p-0 text-white">
-          <DrawerTitle>Корридор</DrawerTitle>
-          <DrawerDescription />
-        </DrawerHeader>
-        <DrawerFooter>
-          <button
-            onClick={() => {
-              addCorridor(corridorId, direction, side)
-            }}
-          >
-            Установить {direction}
-          </button>
-          <DrawerClose>Отмена</DrawerClose>
-        </DrawerFooter>
-      </DrawerContent>
-    </Drawer>
+    <button type="button" onClick={handleClick}>
+      {children}
+    </button>
   )
 }
 
-export default CorridorConfirm
+export default CorridorConfirmTrigger

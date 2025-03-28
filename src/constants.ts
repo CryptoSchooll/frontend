@@ -33,41 +33,51 @@ export const CLASSES = [
   {
     id: "class1",
     name: "Литература",
+    cost: 100,
   },
   {
     id: "class2",
     name: "Русский язык",
+    cost: 200,
   },
   {
     id: "class3",
     name: "География",
+    cost: 300,
   },
   {
     id: "class4",
     name: "История",
+    cost: 400,
   },
   {
     id: "class5",
     name: "Математика",
+    cost: 500,
   },
   {
     id: "class6",
     name: "Биология",
+    cost: 600,
   },
   {
     id: "class7",
     name: "Английский",
+    cost: 700,
   },
   {
     id: "class8",
     name: "Информатика",
+    cost: 800,
   },
   {
     id: "class9",
     name: "Физика",
+    cost: 900,
   },
   {
     id: "class10",
     name: "Химия",
+    cost: 1000,
   },
 ]

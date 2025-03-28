@@ -1,6 +1,7 @@
 import { Navbar, UserHeader } from "@/components"
+import { GlobalDrawers } from "@/components/GlobalDrawer"
 import usePage from "@/hooks/usePage"
-import { Broadcast, Tasks, Home, Quizzes, Club } from "@/pages"
+import { Broadcast, Club, Home, Quizzes, Tasks } from "@/pages"
 
 const AppLayout: React.FC = () => {
   const { currentPage } = usePage()
@@ -42,6 +43,8 @@ const AppLayout: React.FC = () => {
       <footer className="bg-black shadow">
         <Navbar />
       </footer>
+
+      <GlobalDrawers />
     </div>
   )
 }
