@@ -2,6 +2,8 @@ import { create } from "zustand"
 
 import { DIRECTIONS, OPOSITE_DIRECTIONS } from "@/constants"
 
+const MAX_CORRIDORS = 8
+
 export type GameStore = {
   corridors: Corridor[]
   filled: boolean
@@ -53,7 +55,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
           }
 
           const classes = [...corridor.classes, newClass]
-          if (classes.length === 4) filled = true
+          if (classes.length === 4)
+            filled = state.corridors.length < MAX_CORRIDORS
 
           return {
             ...corridor,
