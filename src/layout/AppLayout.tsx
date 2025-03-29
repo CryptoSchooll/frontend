@@ -1,6 +1,7 @@
 import { Navbar, UserHeader } from "@/components"
+import { GlobalDrawers } from "@/components/GlobalDrawer"
 import usePage from "@/hooks/usePage"
-import { Broadcast, Clans, Home, Quizzes, Tasks } from "@/pages"
+import { Broadcast, Club, Home, Quizzes, Tasks } from "@/pages"
 
 const AppLayout: React.FC = () => {
   const { currentPage } = usePage()
@@ -19,8 +20,8 @@ const AppLayout: React.FC = () => {
     case "tasks":
       pageContent = <Tasks />
       break
-    case "clans":
-      pageContent = <Clans />
+    case "club":
+      pageContent = <Club />
       break
     default:
       pageContent = <div>Страница не найдена</div>
@@ -29,7 +30,7 @@ const AppLayout: React.FC = () => {
   return (
     <div className="relative min-h-screen">
       {/* Фиксированный хедер без фона и лишних отступов */}
-      <header className="fixed left-0 right-0 top-4 z-10">
+      <header className="fixed left-0 right-0 top-0 z-10">
         <UserHeader />
       </header>
 
@@ -39,9 +40,11 @@ const AppLayout: React.FC = () => {
       </main>
 
       {/* Фиксированный нижний навбар (если нужен именно фиксированный) */}
-      <footer className="fixed bottom-0 left-0 right-0 z-10 bg-white p-4 shadow">
+      <footer className="bg-black shadow">
         <Navbar />
       </footer>
+
+      <GlobalDrawers />
     </div>
   )
 }

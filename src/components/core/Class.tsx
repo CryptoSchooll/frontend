@@ -1,6 +1,6 @@
 import { memo } from "react"
 
-import ClassShopMenu from "./ClassShopMenu"
+import ClassShopTrigger from "./ClassShopTrigger"
 
 import { CLASS_POSITIONS } from "@/constants"
 
@@ -33,7 +33,7 @@ const ClassMemo = ({
         ...posMeta,
       }}
     >
-      <ClassShopMenu corridorId={corridorId} position={classData.position}>
+      <ClassShopTrigger corridorId={corridorId} position={classData.position}>
         <div className="relative size-10">
           <div
             className="absolute top-1/2 h-2 w-full bg-amber-100"
@@ -48,7 +48,7 @@ const ClassMemo = ({
             }}
           />
         </div>
-      </ClassShopMenu>
+      </ClassShopTrigger>
     </div>
   )
 }

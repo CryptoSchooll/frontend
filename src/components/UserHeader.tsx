@@ -1,34 +1,37 @@
 import type { FC } from "react"
 
+import useBalanceStore from "@/hooks/balanceStore"
+
 const UserHeader: FC = () => {
+  const { balance, income } = useBalanceStore()
+
   return (
-    // Убираем left-[33px] top-[19px] и делаем контейнер relative + mx-auto
-    <div className="relative mx-auto h-16 w-80">
+    <div className="mx-auto flex w-[27rem] items-center p-4">
       {/* Аватар */}
-      <div className="absolute left-0 top-[2px] h-12 w-12 rounded-full bg-zinc-300" />
+      <img
+        alt="Pavel"
+        className="h-16 w-16 rounded-full object-cover"
+        src="https://via.placeholder.com/150" // Замените на реальное изображение
+      />
 
-      {/* Имя пользователя */}
-      <div className="absolute left-[72px] top-[1px] font-['Inter'] text-sm font-normal text-black">
-        Pavel Durov
-      </div>
+      <div className="ml-4 flex flex-col">
+        {/* Имя пользователя */}
+        <span className="text-xl font-bold text-black">Pavel Durov</span>
 
-      {/* Полоса/фон (вероятно, под счёт) */}
-      <div className="absolute left-[72px] top-[20px] h-7 w-60 bg-zinc-300" />
+        {/* Полоса со счётом (градиент) */}
+        <div className="relative mt-2 h-10 w-72 rounded-full bg-gradient-to-r from-purple-700 to-purple-500">
+          <span className="absolute inset-0 flex items-center justify-center text-lg font-semibold text-white">
+            {balance}
+          </span>
 
-      {/* Очки (счёт) */}
-      <div className="absolute left-[139px] top-[25px] w-24 text-center font-['Intro_Regular'] text-xl font-normal leading-snug text-black">
-        4.345.356
-      </div>
+          {/* Кружок с множителем (x1.3) */}
+          <div className="h-13 w-13 absolute right-0 top-0 flex -translate-y-1/4 translate-x-1/4 items-center justify-center rounded-full bg-purple-800">
+            <span className="text-sm text-white">x1.3</span>
+          </div>
+        </div>
 
-      {/* Круг для множителя */}
-      <div className="absolute left-[287px] top-0 h-10 w-10 rounded-full bg-zinc-500" />
-      <div className="absolute left-[295px] top-[11px] text-center font-['Intro_Regular'] text-sm font-normal leading-snug text-white">
-        x1.3
-      </div>
-
-      {/* Скорость (например, +1.2K/min) */}
-      <div className="absolute left-[72px] top-[49px] text-center font-['Intro_Book'] text-xs font-normal leading-snug text-black">
-        +1.2K/min
+        {/* Скорость */}
+        <span className="mt-1 text-sm text-white">+{income}/sec</span>
       </div>
     </div>
   )

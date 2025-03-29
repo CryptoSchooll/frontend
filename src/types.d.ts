@@ -6,16 +6,18 @@ type Class = {
   id: string
   position: Position
   name: string
+  cost: number
+  income: number
 }
 
 type ClassLike =
   | ({
-      isClass: true
-    } & Class)
+    isClass: true
+  } & Class)
   | {
-      position: Position
-      isClass: false
-    }
+    position: Position
+    isClass: false
+  }
 
 type Direction = "up" | "down" | "left" | "right"
 
