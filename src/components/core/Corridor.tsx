@@ -1,7 +1,7 @@
 import { memo, useMemo } from "react"
 
 import Class from "./Class"
-import CorridorConfirm from "./CorridorConfirm"
+import CorridorConfirmTrigger from "./CorridorConfirmTrigger"
 
 import { BUTTONS_POSITIONS, CORRIDOR_POSITIONS } from "@/constants"
 
@@ -25,21 +25,21 @@ const ExpansionButtons = ({
         }}
       >
         {directions.map((direction) => (
-          <CorridorConfirm
+          <CorridorConfirmTrigger
             key={`${side}-${direction}`}
             corridorId={corridorId}
             direction={direction}
             side={side}
           >
-            <button
+            <div
               className="absolute size-8 rounded bg-green-500 text-white"
               style={{
                 ...BUTTONS_POSITIONS[direction],
               }}
             >
               {direction[0].toUpperCase()}
-            </button>
-          </CorridorConfirm>
+            </div>
+          </CorridorConfirmTrigger>
         ))}
       </div>
     </div>

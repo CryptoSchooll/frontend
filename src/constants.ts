@@ -33,41 +33,61 @@ export const CLASSES = [
   {
     id: "class1",
     name: "Литература",
+    cost: 100,
+    income: 1,
   },
   {
     id: "class2",
     name: "Русский язык",
+    cost: 200,
+    income: 2,
   },
   {
     id: "class3",
     name: "География",
+    cost: 300,
+    income: 3,
   },
   {
     id: "class4",
     name: "История",
+    cost: 400,
+    income: 4,
   },
   {
     id: "class5",
     name: "Математика",
+    cost: 500,
+    income: 5,
   },
   {
     id: "class6",
     name: "Биология",
+    cost: 600,
+    income: 6,
   },
   {
     id: "class7",
     name: "Английский",
+    cost: 700,
+    income: 7,
   },
   {
     id: "class8",
     name: "Информатика",
+    cost: 800,
+    income: 8,
   },
   {
     id: "class9",
     name: "Физика",
+    cost: 900,
+    income: 9,
   },
   {
     id: "class10",
     name: "Химия",
+    cost: 1000,
+    income: 10,
   },
 ]

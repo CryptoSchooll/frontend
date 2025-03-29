@@ -1,6 +1,10 @@
 import type { FC } from "react"
 
+import useBalanceStore from "@/hooks/balanceStore"
+
 const UserHeader: FC = () => {
+  const { balance, income } = useBalanceStore()
+
   return (
     <div className="mx-auto flex w-[27rem] items-center p-4">
       {/* Аватар */}
@@ -17,7 +21,7 @@ const UserHeader: FC = () => {
         {/* Полоса со счётом (градиент) */}
         <div className="relative mt-2 h-10 w-72 rounded-full bg-gradient-to-r from-purple-700 to-purple-500">
           <span className="absolute inset-0 flex items-center justify-center text-lg font-semibold text-white">
-            4.345.356
+            {balance}
           </span>
 
           {/* Кружок с множителем (x1.3) */}
@@ -27,7 +31,7 @@ const UserHeader: FC = () => {
         </div>
 
         {/* Скорость */}
-        <span className="mt-1 text-sm text-black">+1.2K/min</span>
+        <span className="mt-1 text-sm text-white">+{income}/sec</span>
       </div>
     </div>
   )
