@@ -3,7 +3,7 @@ import type { FC } from "react"
 import useBalanceStore from "@/hooks/balanceStore"
 
 const UserHeader: FC = () => {
-  const balance = useBalanceStore((state) => state.balance)
+  const { balance, income } = useBalanceStore()
 
   return (
     <div className="mx-auto flex w-[27rem] items-center p-4">
@@ -31,7 +31,7 @@ const UserHeader: FC = () => {
         </div>
 
         {/* Скорость */}
-        <span className="mt-1 text-sm text-black">+1.2K/min</span>
+        <span className="mt-1 text-sm text-white">+{income}/sec</span>
       </div>
     </div>
   )

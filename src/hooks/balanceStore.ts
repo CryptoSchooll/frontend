@@ -4,8 +4,9 @@ type balanceStore = {
   balance: number
   income: number
   actions: {
-    addIncome: () => void
-    setIncome: (newRate: number) => void
+    updateBalance: () => void
+    addIncome: (rate: number) => void
+    substractIncome: (rate: number) => void
     addBalance: (amount: number) => void
     substractBalance: (amount: number) => void
     canAfford: (cost: number) => boolean
@@ -14,13 +15,22 @@ type balanceStore = {
 
 const useBalanceStore = create<balanceStore>((set, get) => ({
   balance: 0,
-  income: 0,
+  income: 10,
   actions: {
-    addIncome: () =>
+    updateBalance: () =>
       set((state) => ({
         balance: state.balance + state.income,
       })),
-    setIncome: (newRate) => set({ income: Math.max(0, newRate) }),
+    addIncome: (rate) => {
+      if (rate <= 0) return
+
+      set((state) => ({ income: state.income + rate }))
+    },
+    substractIncome: (rate) => {
+      if (rate <= 0) return
+
+      set((state) => ({ income: Math.max(0, state.income - rate) }))
+    },
     addBalance: (amount) => {
       if (amount <= 0) return
 
@@ -36,7 +46,7 @@ const useBalanceStore = create<balanceStore>((set, get) => ({
 }))
 
 setInterval(() => {
-  useBalanceStore.getState().actions.addIncome()
+  useBalanceStore.getState().actions.updateBalance()
 }, 1000)
 
 export default useBalanceStore

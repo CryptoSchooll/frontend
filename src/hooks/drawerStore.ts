@@ -1,17 +1,17 @@
 import { create } from "zustand"
 
-type ShopDrawerContext = {
+export type ShopDrawerContext = {
   corridorId: string
   position: Position
 }
 
-type ConfirmDrawerContext = {
+export type ConfirmDrawerContext = {
   corridorId: string
   direction: Direction
   side: Side
 }
 
-type DrawerStore = {
+export type DrawerStore = {
   isShopDrawerOpen: boolean
   shopDrawerContext: ShopDrawerContext | null
 

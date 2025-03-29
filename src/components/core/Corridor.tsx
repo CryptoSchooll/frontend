@@ -1,7 +1,7 @@
 import { memo, useMemo } from "react"
 
 import Class from "./Class"
-import CorridorConfirmTrigger from "./CorridorConfirm"
+import CorridorConfirmTrigger from "./CorridorConfirmTrigger"
 
 import { BUTTONS_POSITIONS, CORRIDOR_POSITIONS } from "@/constants"
 

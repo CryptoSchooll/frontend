@@ -7,6 +7,7 @@ type Class = {
   position: Position
   name: string
   cost: number
+  income: number
 }
 
 type ClassLike =

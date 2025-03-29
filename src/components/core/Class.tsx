@@ -1,6 +1,6 @@
 import { memo } from "react"
 
-import ClassShopTrigger from "./ClassShopMenu"
+import ClassShopTrigger from "./ClassShopTrigger"
 
 import { CLASS_POSITIONS } from "@/constants"
 
