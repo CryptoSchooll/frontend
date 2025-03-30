@@ -2,6 +2,7 @@ import type { FC } from "react"
 
 import { useEffect, useState } from "react"
 
+import useBalanceStore from "@/hooks/balanceStore"
 import { useQuizStore } from "@/hooks/quizStore"
 
 interface Option {
@@ -24,6 +25,12 @@ export interface QuizSubmitResponse {
   reward: number
   updatedBalance: number
   correctAnswerIds: string[]
+}
+
+interface Answer {
+  questionId: string
+  answerId: string
+  answerTime: number
 }
 
 const fetchQuizQuestions = async (quizId: string): Promise<Question[]> => {
@@ -55,18 +62,36 @@ const fetchQuizQuestions = async (quizId: string): Promise<Question[]> => {
 }
 
 const submitQuizAnswers = async (
-  quizId: string,
-  answers: any,
-  totalCompletionTime: number,
+  _quizId: string,
+  answers: Answer[],
+  _totalCompletionTime: number,
 ): Promise<QuizSubmitResponse> => {
   await new Promise((resolve) => setTimeout(resolve, 500))
+  const reward = 1000
+  const currentBalance = useBalanceStore.getState().balance
+  const updatedBalance = currentBalance + reward
+
+  // Создаем моковый результат квиза
+  const quizResult = {
+    id: crypto.randomUUID(),
+    quizId: _quizId,
+    completedAt: new Date().toISOString(),
+    correctAnswers: 1,
+    totalQuestions: answers.length,
+    reward,
+    score: 50,
+  }
+
+  // Обновляем результат в store
+  useQuizStore.getState().actions.updateQuizResult(_quizId, quizResult)
+
   return {
-    quizId,
+    quizId: _quizId,
     correctAnswers: 1,
     totalQuestions: answers.length,
     score: 50,
-    reward: 1000,
-    updatedBalance: 151000,
+    reward,
+    updatedBalance,
     correctAnswerIds: ["a2", "a7"],
   }
 }
@@ -79,10 +104,7 @@ interface QuizBoxProps {
 const QuizBox: FC<QuizBoxProps> = ({ quizId, onClose }) => {
   const {
     progress,
-    setProgress,
-    clearProgress,
-    setQuizFinished,
-    clearSelection,
+    actions: { setProgress, clearProgress, setQuizFinished, clearSelection },
   } = useQuizStore()
   const [questions, setQuestions] = useState<Question[]>([])
   const [submitting, setSubmitting] = useState(false)
@@ -157,7 +179,7 @@ const QuizBox: FC<QuizBoxProps> = ({ quizId, onClose }) => {
     }
   }
 
-  const handleSubmitQuiz = async (answers: any, quizStartedAt: number) => {
+  const handleSubmitQuiz = async (answers: Answer[], quizStartedAt: number) => {
     setSubmitting(true)
     const totalTime = (Date.now() - quizStartedAt) / 1000
     try {
@@ -176,7 +198,7 @@ const QuizBox: FC<QuizBoxProps> = ({ quizId, onClose }) => {
     : 0
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-gray-900/40">
+    <div className="fixed inset-0 flex items-center justify-center bg-gray-900/20 backdrop-blur-sm">
       <div className="relative w-full max-w-lg rounded-md bg-white p-4 shadow-lg">
         {result ? (
           <div>
@@ -191,6 +213,9 @@ const QuizBox: FC<QuizBoxProps> = ({ quizId, onClose }) => {
             <button
               className="mt-4 rounded bg-blue-500 px-4 py-2 text-white"
               onClick={() => {
+                if (result) {
+                  useBalanceStore.getState().actions.addBalance(result.reward)
+                }
                 onClose()
                 clearProgress()
                 clearSelection()

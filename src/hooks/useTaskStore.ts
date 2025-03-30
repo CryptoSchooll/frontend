@@ -1,8 +1,11 @@
 // D:/git/frontend/src/hooks/useTaskStore.ts или где он у вас лежит
 
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
-import type { Task, TaskStatus, TaskType, CompleteTaskResponse } from "./types"; // Предположим, типы вынесены
+import type { CompleteTaskResponse, Task, TaskStatus, TaskType } from "./types" // Предположим, типы вынесены
+
+import { create } from "zustand"
+import { createJSONStorage, persist } from "zustand/middleware"
+
+import useBalanceStore from "@/hooks/balanceStore" // Добавляем импорт balanceStore
 
 // --- МОКОВЫЕ ДАННЫЕ ---
 
@@ -64,7 +67,7 @@ const MOCK_TASKS: Task[] = [
     localizedName: "Посмотреть рекламу",
     localizedDescription: "Посмотрите короткий ролик.",
   },
-    {
+  {
     id: "task-onetime-2",
     reward: 1000,
     taskType: "one_time",
@@ -75,82 +78,107 @@ const MOCK_TASKS: Task[] = [
     localizedName: "Совершить покупку",
     localizedDescription: "Купите любой товар в магазине.",
   },
-];
+]
 
 // --- ИМИТАЦИЯ ЗАДЕРЖКИ СЕТИ ---
-const networkDelay = (delay = 700) => new Promise((resolve) => setTimeout(resolve, delay));
+const networkDelay = (delay = 700) =>
+  new Promise((resolve) => setTimeout(resolve, delay))
 
 // --- МОКОВЫЕ ФУНКЦИИ FETCH ---
 
 const mockFetchTasks = async (type?: TaskType): Promise<Task[]> => {
-  console.log(`[MOCK API] GET /api/v1/tasks ${type ? `?type=${type}` : ''}`);
-  await networkDelay();
+  console.log(`[MOCK API] GET /api/v1/tasks ${type ? `?type=${type}` : ""}`)
+  await networkDelay()
 
-  // // Опционально: имитация ошибки сети/сервера
-  // if (Math.random() < 0.1) { // 10% шанс ошибки
-  //   console.error("[MOCK API] Simulated fetchTasks error");
-  //   throw new Error("Simulated server error fetching tasks.");
-  // }
+  // Получаем текущее состояние задач из store
+  const currentTasks = useTaskStore.getState().tasks
 
-  if (type) {
-    return MOCK_TASKS.filter(task => task.taskType === type);
+  // Если задач нет в store, используем MOCK_TASKS как начальные данные
+  if (currentTasks.length === 0) {
+    const initialTasks = [...MOCK_TASKS]
+    useTaskStore.setState({ tasks: initialTasks })
+    return type ? initialTasks.filter((task) => task.taskType === type) : initialTasks
   }
-  return [...MOCK_TASKS]; // Возвращаем копию, чтобы избежать случайных мутаций
-};
 
-const mockCompleteTask = async (taskId: string): Promise<CompleteTaskResponse> => {
-    console.log(`[MOCK API] POST /api/v1/tasks/${taskId}/complete`);
-    await networkDelay();
+  // Если задачи уже есть в store, используем их
+  return type ? currentTasks.filter((task) => task.taskType === type) : currentTasks
+}
 
-    const taskIndex = MOCK_TASKS.findIndex(t => t.id === taskId);
-    const task = taskIndex !== -1 ? MOCK_TASKS[taskIndex] : null;
+const mockCompleteTask = async (
+  taskId: string,
+): Promise<CompleteTaskResponse> => {
+  console.log(`[MOCK API] POST /api/v1/tasks/${taskId}/complete`)
+  await networkDelay()
 
-    // // Опционально: имитация ошибки сети/сервера
-    // if (Math.random() < 0.1) { // 10% шанс ошибки
-    //   console.error("[MOCK API] Simulated completeTask error");
-    //   throw new Error(`Simulated server error completing task ${taskId}.`);
-    // }
+  // Получаем текущие задачи из store
+  const currentTasks = useTaskStore.getState().tasks
+  const taskIndex = currentTasks.findIndex((t) => t.id === taskId)
+  const task = taskIndex !== -1 ? currentTasks[taskIndex] : null
 
-    if (!task) {
-        console.warn(`[MOCK API] Task ${taskId} not found.`);
-        return { success: false, message: "Task not found" };
-    }
+  if (!task) {
+    console.warn(`[MOCK API] Task ${taskId} not found.`)
+    return { success: false, message: "Task not found" }
+  }
 
-    if (task.status === 'completed' || !task.isAvailable) {
-        console.warn(`[MOCK API] Task ${taskId} is not available for completion.`);
-        return { success: false, message: "Task not available or already completed" };
-    }
-
-    // Имитация успешного выполнения
-    let nextAvailableAt: string | null = null;
-    if ((task.taskType === 'daily' || task.taskType === 'repeatable') && task.cooldownHours) {
-        const now = new Date();
-        nextAvailableAt = new Date(now.getTime() + task.cooldownHours * 60 * 60 * 1000).toISOString();
-    }
-
-    // Имитируем обновленный баланс (просто для примера)
-    const simulatedOldBalance = 10000;
-    const updatedBalance = simulatedOldBalance + task.reward;
-
-    console.log(`[MOCK API] Task ${taskId} completed successfully. Reward: ${task.reward}`);
+  if (task.status === "completed" || !task.isAvailable) {
+    console.warn(`[MOCK API] Task ${taskId} is not available for completion.`)
     return {
-        success: true,
-        reward: task.reward,
-        updatedBalance: updatedBalance,
-        nextAvailableAt: nextAvailableAt,
-    };
-};
+      success: false,
+      message: "Task not available or already completed",
+    }
+  }
 
+  // Имитация успешного выполнения
+  let nextAvailableAt: string | null = null
+  if (
+    (task.taskType === "daily" || task.taskType === "repeatable") &&
+    task.cooldownHours
+  ) {
+    const now = new Date()
+    nextAvailableAt = new Date(
+      now.getTime() + task.cooldownHours * 60 * 60 * 1000,
+    ).toISOString()
+  }
+
+  // Обновляем баланс через balanceStore
+  if (task.reward > 0) {
+    useBalanceStore.getState().actions.addBalance(task.reward)
+    console.log(`[MOCK API] Added ${task.reward} to balance via balanceStore`)
+  }
+
+  // Обновляем задачу в store
+  const updatedTasks = currentTasks.map((t) => {
+    if (t.id === taskId) {
+      return {
+        ...t,
+        status: "completed" as TaskStatus,
+        isAvailable: false,
+        nextAvailableAt: nextAvailableAt,
+      }
+    }
+    return t
+  })
+  useTaskStore.setState({ tasks: updatedTasks })
+
+  console.log(
+    `[MOCK API] Task ${taskId} completed successfully. Reward: ${task.reward}`,
+  )
+  return {
+    success: true,
+    reward: task.reward,
+    nextAvailableAt: nextAvailableAt,
+  }
+}
 
 // --- ОБНОВЛЕННЫЙ useTaskStore С МОКАМИ ---
 
 interface TaskStore {
-  tasks: Task[];
-  loading: boolean;
-  completingTaskId: string | null;
-  error: string | null;
-  fetchTasks: (type?: TaskType) => Promise<void>;
-  completeTask: (taskId: string) => Promise<CompleteTaskResponse | null>;
+  tasks: Task[]
+  loading: boolean
+  completingTaskId: string | null
+  error: string | null
+  fetchTasks: (type?: TaskType) => Promise<void>
+  completeTask: (taskId: string) => Promise<CompleteTaskResponse | null>
 }
 
 export const useTaskStore = create<TaskStore>()(
@@ -164,34 +192,37 @@ export const useTaskStore = create<TaskStore>()(
       // --- Получение списка задач (ИСПОЛЬЗУЕТ МОК) ---
       fetchTasks: async (type?: TaskType) => {
         // Убрали получение токена, т.к. моку он не нужен
-        set({ loading: true, error: null });
+        set({ loading: true, error: null })
         try {
           // Вызываем моковую функцию вместо fetch
-          const tasksData = await mockFetchTasks(type);
-          set({ tasks: tasksData, loading: false });
+          const tasksData = await mockFetchTasks(type)
+          set({ tasks: tasksData, loading: false })
         } catch (err: unknown) {
-          console.error("Error fetching tasks (mock):", err);
-          set({ error: (err as Error).message, loading: false });
+          console.error("Error fetching tasks (mock):", err)
+          set({ error: (err as Error).message, loading: false })
         }
       },
 
       // --- Отметка задачи как выполненной (ИСПОЛЬЗУЕТ МОК) ---
-      completeTask: async (taskId: string): Promise<CompleteTaskResponse | null> => {
-         // Убрали получение токена
+      completeTask: async (
+        taskId: string,
+      ): Promise<CompleteTaskResponse | null> => {
+        // Убрали получение токена
         if (get().completingTaskId) {
-            console.warn("Another task completion is already in progress.");
-            return null;
+          console.warn("Another task completion is already in progress.")
+          return null
         }
-        set({ completingTaskId: taskId, error: null });
+        set({ completingTaskId: taskId, error: null })
 
         try {
           // Вызываем моковую функцию вместо fetch
-          const responseData = await mockCompleteTask(taskId);
+          const responseData = await mockCompleteTask(taskId)
 
           if (!responseData.success) {
-             // Обработка неудачи из мокового ответа
-             const errorMessage = responseData.message || `Failed to complete task ${taskId}`;
-             throw new Error(errorMessage);
+            // Обработка неудачи из мокового ответа
+            const errorMessage =
+              responseData.message || `Failed to complete task ${taskId}`
+            throw new Error(errorMessage)
           }
 
           // Успешно выполнено - обновляем состояние задачи в сторе
@@ -201,30 +232,37 @@ export const useTaskStore = create<TaskStore>()(
               if (task.id === taskId) {
                 return {
                   ...task,
-                  status: 'completed' as TaskStatus,
+                  status: "completed" as TaskStatus,
                   isAvailable: responseData.nextAvailableAt ? false : false, // После выполнения всегда false до след. доступности
                   nextAvailableAt: responseData.nextAvailableAt || null,
-                };
+                }
               }
-              return task;
-            });
-            return { tasks: updatedTasks, completingTaskId: null };
-          });
+              return task
+            })
+            return { tasks: updatedTasks, completingTaskId: null }
+          })
 
-          return responseData; // Возвращаем моковые данные ответа
-
+          return responseData // Возвращаем моковые данные ответа
         } catch (err: unknown) {
-          console.error(`Error completing task ${taskId} (mock):`, err);
-          set({ error: (err as Error).message, completingTaskId: null });
-          return null;
+          console.error(`Error completing task ${taskId} (mock):`, err)
+          set({ error: (err as Error).message, completingTaskId: null })
+          return null
         }
       },
     }),
     {
       name: "task-store",
+      storage: createJSONStorage(() => localStorage), // Явно указываем localStorage
+      partialize: (state) => ({
+        tasks: state.tasks,
+        // Не сохраняем временные состояния
+        // loading: state.loading,
+        // completingTaskId: state.completingTaskId,
+        // error: state.error,
+      }),
     },
   ),
-);
+)
 
 // Не забудьте создать файл types.ts и переместить туда интерфейсы Task, TaskStatus, TaskType, CompleteTaskResponse
 // Пример types.ts

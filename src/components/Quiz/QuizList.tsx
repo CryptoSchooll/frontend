@@ -14,19 +14,11 @@ const QuizList: React.FC = () => {
     quizFinished,
     loading,
     error,
-    fetchQuizzes,
-    selectQuiz,
-    clearSelection,
-    clearProgress,
+    actions: { selectQuiz, clearSelection, clearProgress },
   } = useQuizStore()
 
   const [showQuiz, setShowQuiz] = useState(false)
   const [showContinueModal, setShowContinueModal] = useState(false)
-
-  // Загружаем квизы при монтировании компонента.
-  useEffect(() => {
-    fetchQuizzes()
-  }, [fetchQuizzes])
 
   // Объединяем логику показа модального окна "Продолжить викторину?" в один эффект.
   useEffect(() => {
@@ -81,10 +73,6 @@ const QuizList: React.FC = () => {
   if (loading) return <div>Загрузка...</div>
   if (error) return <div>Ошибка: {error}</div>
 
-  if (showQuiz && selectedQuiz) {
-    return <QuizBox quizId={selectedQuiz.id} onClose={handleCollectReward} />
-  }
-
   return (
     <div className="w-full">
       <div className="flex w-full flex-col space-y-2">
@@ -117,7 +105,6 @@ const QuizList: React.FC = () => {
         })}
       </div>
 
-      {/* Если выбран квиз и нет сохранённого прогресса, показываем окно подтверждения нового запуска */}
       {selectedQuiz && !showQuiz && !showContinueModal && (
         <ConfirmModal
           message={`Do you want to start ${selectedQuiz.title}?`}
@@ -133,6 +120,11 @@ const QuizList: React.FC = () => {
           onCancel={handleContinueCancel}
           onConfirm={handleContinueConfirm}
         />
+      )}
+
+      {/* QuizBox теперь отображается поверх QuizList */}
+      {showQuiz && selectedQuiz && (
+        <QuizBox quizId={selectedQuiz.id} onClose={handleCollectReward} />
       )}
     </div>
   )

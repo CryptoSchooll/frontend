@@ -86,9 +86,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const isValidDirection =
         side === "start"
           ? previousCorridor.availableDirectionsStart.includes(direction) &&
-          previousCorridor.direction !== direction
+            previousCorridor.direction !== direction
           : previousCorridor.availableDirectionsEnd.includes(direction) &&
-          OPOSITE_DIRECTIONS[previousCorridor.direction] !== direction
+            OPOSITE_DIRECTIONS[previousCorridor.direction] !== direction
 
       if (!isValidDirection) {
         console.warn(
@@ -123,15 +123,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
             const newDirectionsStart =
               side === "start"
                 ? corridor.availableDirectionsStart.filter(
-                  (dir) => dir !== direction,
-                )
+                    (dir) => dir !== direction,
+                  )
                 : corridor.availableDirectionsStart
 
             const newDirectionsEnd =
               side === "end"
                 ? corridor.availableDirectionsEnd.filter(
-                  (dir) => dir !== direction,
-                )
+                    (dir) => dir !== direction,
+                  )
                 : corridor.availableDirectionsEnd
 
             return {
