@@ -1,5 +1,6 @@
 import { Camera, CameraPortal, Corridor } from "@core"
 
+import useBalanceStore from "@/hooks/balanceStore"
 import { useGameStore } from "@/hooks/gameStore"
 
 const Grid = () => (
@@ -12,6 +13,8 @@ const Grid = () => (
 
 const Home = () => {
   const { corridors, filled } = useGameStore()
+  const { electricityOn, electricityCost, actions } = useBalanceStore()
+
   return (
     <div className="relative h-screen bg-black">
       <CameraPortal>
@@ -24,6 +27,22 @@ const Home = () => {
           <Grid />
         </Camera>
       </CameraPortal>
+      {!electricityOn && (
+        <>
+          <div className="z-1 fixed h-screen w-screen bg-black/80" />
+          <div className="bottom-30 z-1 fixed left-1/2 -translate-x-1/2 bg-white px-10 py-2">
+            <h1 className="text-center text-xl font-bold">Light is off!</h1>
+            <p className="mt-2 text-center">school has quit working.</p>
+            <p className="text-center">fix the lights</p>
+            <button
+              className="mx-auto mt-4 block bg-gray-700 px-20 py-2 text-white"
+              onClick={() => actions.payForElectricity()}
+            >
+              fix - {electricityCost}EDt
+            </button>
+          </div>
+        </>
+      )}
     </div>
   )
 }
