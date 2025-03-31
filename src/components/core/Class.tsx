@@ -1,5 +1,6 @@
 import { memo } from "react"
 
+import ClassInfoTrigger from "./ClassInfoTrigger"
 import ClassShopTrigger from "./ClassShopTrigger"
 
 import { CLASS_POSITIONS } from "@/constants"
@@ -21,7 +22,9 @@ const ClassMemo = ({
           ...posMeta,
         }}
       >
-        {classData.name}
+        <ClassInfoTrigger classData={classData} corridorId={corridorId}>
+          {classData.name}
+        </ClassInfoTrigger>
       </div>
     )
   }

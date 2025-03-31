@@ -1,4 +1,4 @@
-import type { DrawerStore } from "@/hooks/drawerStore"
+import type { UIStore } from "@/hooks/uiStore"
 
 import {
   Drawer,
@@ -16,9 +16,9 @@ const CorridorConfirmDrawer = ({
   confirmDrawerContext,
   closeConfirmDrawer,
 }: {
-  isConfirmDrawerOpen: DrawerStore["isConfirmDrawerOpen"]
-  confirmDrawerContext: DrawerStore["confirmDrawerContext"]
-  closeConfirmDrawer: DrawerStore["actions"]["closeConfirmDrawer"]
+  isConfirmDrawerOpen: UIStore["isConfirmDrawerOpen"]
+  confirmDrawerContext: UIStore["confirmDrawerContext"]
+  closeConfirmDrawer: UIStore["actions"]["closeConfirmDrawer"]
 }) => {
   const { addCorridor } = useGameStore((state) => state.actions)
 

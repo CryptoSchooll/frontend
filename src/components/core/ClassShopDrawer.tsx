@@ -1,4 +1,4 @@
-import type { DrawerStore } from "@/hooks/drawerStore"
+import type { UIStore } from "@/hooks/uiStore"
 
 import {
   Drawer,
@@ -19,9 +19,9 @@ const ClassShopDrawer = ({
   closeShopDrawer,
   isShopDrawerOpen,
 }: {
-  shopDrawerContext: DrawerStore["shopDrawerContext"]
-  closeShopDrawer: DrawerStore["actions"]["closeShopDrawer"]
-  isShopDrawerOpen: DrawerStore["isShopDrawerOpen"]
+  shopDrawerContext: UIStore["shopDrawerContext"]
+  closeShopDrawer: UIStore["actions"]["closeShopDrawer"]
+  isShopDrawerOpen: UIStore["isShopDrawerOpen"]
 }) => {
   const { appendClass } = useGameStore((state) => state.actions)
   const { balance, actions } = useBalanceStore()
