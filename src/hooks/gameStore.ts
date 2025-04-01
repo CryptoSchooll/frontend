@@ -4,11 +4,20 @@ import { DIRECTIONS, OPOSITE_DIRECTIONS } from "@/constants"
 
 const MAX_CORRIDORS = 8
 
+const calculateFilledState = (corridors: Corridor[]): boolean => {
+  if (corridors.length >= MAX_CORRIDORS) {
+    return false
+  }
+
+  return corridors.every((corridor) => corridor.classes.length === 4)
+}
+
 export type GameStore = {
   corridors: Corridor[]
   filled: boolean
   actions: {
     appendClass: (corridorId: string, newClass: Class) => void
+    removeClass: (corridorId: string, position: number) => void
     addCorridor: (
       previousCorridorId: string,
       direction: Direction,
@@ -39,10 +48,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
   actions: {
     appendClass: (corridorId: string, newClass: Class) =>
       set((state) => {
-        let filled = false
+        let corridorFound = false
         const updatedCorridors = state.corridors.map((corridor) => {
           if (corridor.id !== corridorId) return corridor
 
+          corridorFound = true
           const isPositionOccupied = corridor.classes.some(
             (cls) => cls.position === newClass.position,
           )
@@ -54,21 +64,78 @@ export const useGameStore = create<GameStore>((set, get) => ({
             return corridor
           }
 
-          const classes = [...corridor.classes, newClass]
-          if (classes.length === 4)
-            filled = state.corridors.length < MAX_CORRIDORS
+          if (corridor.classes.length >= 4) {
+            console.warn(`Corridor ${corridorId} is already full.`)
+            return corridor
+          }
+
+          const updatedClasses = [...corridor.classes, newClass]
 
           return {
             ...corridor,
-            classes,
+            classes: updatedClasses,
           }
         })
 
-        return { corridors: updatedCorridors, filled }
+        if (!corridorFound) {
+          console.warn(
+            `Corridor with ID ${corridorId} not found for appending class.`,
+          )
+          return state
+        }
+
+        const newFilled = calculateFilledState(updatedCorridors)
+
+        return { corridors: updatedCorridors, filled: newFilled }
+      }),
+
+    removeClass: (corridorId: string, classPosition: number) =>
+      set((state) => {
+        let corridorFound = false
+        const updatedCorridors = state.corridors.map((corridor) => {
+          if (corridor.id !== corridorId) {
+            return corridor
+          }
+
+          corridorFound = true
+          const classExists = corridor.classes.some(
+            (cls) => cls.position === classPosition,
+          )
+
+          if (!classExists) {
+            console.warn(
+              `Class at position ${classPosition} not found in corridor ${corridorId}`,
+            )
+            return corridor
+          }
+
+          const updatedClasses = corridor.classes.filter(
+            (cls) => cls.position !== classPosition,
+          )
+
+          return {
+            ...corridor,
+            classes: updatedClasses,
+          }
+        })
+
+        if (!corridorFound) {
+          console.warn(
+            `Corridor with ID ${corridorId} not found for removing class.`,
+          )
+          return state
+        }
+
+        const newFilled = calculateFilledState(updatedCorridors)
+
+        return { corridors: updatedCorridors, filled: newFilled }
       }),
 
     addCorridor: (previousCorridorId, direction, side) => {
       const state = get()
+
+      if (!state.filled) return
+
       const previousCorridor = state.corridors.find(
         (corridor) => corridor.id === previousCorridorId,
       )

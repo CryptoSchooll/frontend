@@ -1,16 +1,19 @@
+import ClassInfoDialog from "./core/ClassInfoDialog"
 import ClassShopDrawer from "./core/ClassShopDrawer"
 import CorridorConfirmDrawer from "./core/CorridorConfirmDrawer"
 
-import { useDrawerStore } from "@/hooks/drawerStore"
+import { useUIStore } from "@/hooks/uiStore"
 
-export function GlobalDrawers() {
+export function GlobalUI() {
   const {
     isShopDrawerOpen,
     shopDrawerContext,
     isConfirmDrawerOpen,
     confirmDrawerContext,
-  } = useDrawerStore()
-  const { closeShopDrawer, closeConfirmDrawer } = useDrawerStore(
+    isClassInfoOpen,
+    classInfoContext,
+  } = useUIStore()
+  const { closeShopDrawer, closeConfirmDrawer, closeClassInfo } = useUIStore(
     (state) => state.actions,
   )
   return (
@@ -25,6 +28,12 @@ export function GlobalDrawers() {
         closeConfirmDrawer={closeConfirmDrawer}
         confirmDrawerContext={confirmDrawerContext}
         isConfirmDrawerOpen={isConfirmDrawerOpen}
+      />
+
+      <ClassInfoDialog
+        classInfoContext={classInfoContext}
+        closeClassInfo={closeClassInfo}
+        isClassInfoOpen={isClassInfoOpen}
       />
     </>
   )

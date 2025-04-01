@@ -11,26 +11,38 @@ export type ConfirmDrawerContext = {
   side: Side
 }
 
-export type DrawerStore = {
+export type ClassInfoContext = {
+  classData: Class
+  corridorId: string
+}
+
+export type UIStore = {
   isShopDrawerOpen: boolean
   shopDrawerContext: ShopDrawerContext | null
 
   isConfirmDrawerOpen: boolean
   confirmDrawerContext: ConfirmDrawerContext | null
 
+  isClassInfoOpen: boolean
+  classInfoContext: ClassInfoContext | null
+
   actions: {
     openShopDrawer: (context: ShopDrawerContext) => void
     closeShopDrawer: () => void
     openConfirmDrawer: (context: ConfirmDrawerContext) => void
     closeConfirmDrawer: () => void
+    openClassInfo: (context: ClassInfoContext) => void
+    closeClassInfo: () => void
   }
 }
 
-export const useDrawerStore = create<DrawerStore>((set) => ({
+export const useUIStore = create<UIStore>((set) => ({
   isShopDrawerOpen: false,
   shopDrawerContext: null,
   isConfirmDrawerOpen: false,
   confirmDrawerContext: null,
+  isClassInfoOpen: false,
+  classInfoContext: null,
 
   actions: {
     openShopDrawer: (context) =>
@@ -49,12 +61,17 @@ export const useDrawerStore = create<DrawerStore>((set) => ({
     closeConfirmDrawer: () =>
       set({ isConfirmDrawerOpen: false, confirmDrawerContext: null }),
 
-    closeAllDrawers: () =>
-      set({
-        isShopDrawerOpen: false,
-        shopDrawerContext: null,
-        isConfirmDrawerOpen: false,
-        confirmDrawerContext: null,
-      }),
+    openClassInfo: (context) =>
+      set({ isClassInfoOpen: true, classInfoContext: context }),
+    closeClassInfo: () =>
+      set({ isClassInfoOpen: false, classInfoContext: null }),
+
+    // closeAllDrawers: () =>
+    //   set({
+    //     isShopDrawerOpen: false,
+    //     shopDrawerContext: null,
+    //     isConfirmDrawerOpen: false,
+    //     confirmDrawerContext: null,
+    //   }),
   },
 }))

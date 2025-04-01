@@ -1,5 +1,5 @@
 import { Navbar, UserHeader } from "@/components"
-import { GlobalDrawers } from "@/components/GlobalDrawer"
+import { GlobalUI } from "@/components/GlobalUI"
 import usePage from "@/hooks/usePage"
 import { Broadcast, Club, Home, Leaderboard, Quizzes, Tasks } from "@/pages"
 
@@ -94,7 +94,7 @@ const AppLayout: React.FC = () => {
         <Navbar />
       </footer>
 
-      <GlobalDrawers />
+      <GlobalUI />
     </div>
   )
 }
