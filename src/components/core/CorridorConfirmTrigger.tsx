@@ -1,11 +1,11 @@
 import type { FC, PropsWithChildren } from "react"
 
-import { useDrawerStore } from "@/hooks/drawerStore"
+import { useUIStore } from "@/hooks/uiStore"
 
 const CorridorConfirmTrigger: FC<
   PropsWithChildren<{ corridorId: string; direction: Direction; side: Side }>
 > = ({ children, direction, side, corridorId }) => {
-  const { openConfirmDrawer } = useDrawerStore((state) => state.actions)
+  const { openConfirmDrawer } = useUIStore((state) => state.actions)
 
   const handleClick = () => openConfirmDrawer({ corridorId, direction, side })
 

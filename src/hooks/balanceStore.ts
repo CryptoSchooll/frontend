@@ -28,7 +28,7 @@ const ELECTRICITY_COST = 50
 const DEFAULT_INCOME_MULTIPLIER = 1
 
 const useBalanceStore = create<balanceStore>((set, get) => ({
-  balance: ELECTRICITY_COST,
+  balance: ELECTRICITY_COST + 100,
   income: 10,
   electricityPaidUntil: null,
   electricityCost: ELECTRICITY_COST,
