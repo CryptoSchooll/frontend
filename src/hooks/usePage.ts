@@ -1,8 +1,16 @@
 import { create } from "zustand"
 
-type PageStore = {
-  currentPage: string
-  switchPage: (page: string) => void
+type PageType =
+  | "home"
+  | "quizzes"
+  | "broadcast"
+  | "tasks"
+  | "club"
+  | "leaderboard"
+
+interface PageStore {
+  currentPage: PageType
+  switchPage: (page: PageType) => void
 }
 
 const usePage = create<PageStore>((set) => ({

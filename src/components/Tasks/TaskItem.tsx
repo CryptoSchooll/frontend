@@ -1,4 +1,4 @@
-// src/components/Tasks/TaskItem.tsx (Simplified Example)
+// src/components/Tasks/TaskItem.tsx
 
 import type { Task } from "@/hooks/types" // Adjust path
 import type { FC } from "react"
@@ -9,30 +9,45 @@ import {
   ClockIcon,
   LockClosedIcon,
 } from "@heroicons/react/24/outline"
+import { CurrencyDollarIcon, FireIcon, StarIcon } from "@heroicons/react/24/solid"
 
 interface TaskItemProps extends Task {
   onClick: (taskId: string) => void
-  // isLoading prop removed
 }
 
 const TaskItem: FC<TaskItemProps> = ({
   id,
   localizedName,
+  localizedDescription,
   reward,
   status,
   isAvailable,
   nextAvailableAt,
   taskType,
   onClick,
-  // isLoading removed from props
 }) => {
-  // Determine if the item itself should appear interactive or disabled
+  // Определяем визуальное состояние задачи
   const isDisabledVisual = !isAvailable || status === "completed"
-  // Cooldown display logic remains the same
   const showCooldown = !isAvailable && status === "completed" && nextAvailableAt
 
+  // Определяем иконку задачи в зависимости от её типа
+  const getTaskIcon = () => {
+    switch (taskType) {
+      case "daily":
+        return <StarIcon className="h-5 w-5 text-yellow-400" />
+      case "repeatable":
+        return <FireIcon className="h-5 w-5 text-orange-500" />
+      case "one_time":
+        return <CurrencyDollarIcon className="h-5 w-5 text-green-400" />
+      case "quiz":
+        return <StarIcon className="h-5 w-5 text-blue-400" />
+      default:
+        return <StarIcon className="h-5 w-5 text-purple-400" />
+    }
+  }
+
+  // Определяем индикатор статуса задачи
   let StatusIndicator: React.ReactNode = null
-  // Status indicator logic remains largely the same, NO spinner needed here
   if (showCooldown) {
     const availableDate = new Date(nextAvailableAt!)
     const timeString = availableDate.toLocaleTimeString([], {
@@ -40,51 +55,63 @@ const TaskItem: FC<TaskItemProps> = ({
       minute: "2-digit",
     })
     StatusIndicator = (
-      <div className="flex items-center space-x-1 text-xs text-zinc-400">
-        <ClockIcon className="h-4 w-4" />
+      <div className="flex items-center space-x-1 text-xs text-purple-300">
+        <ClockIcon className="h-3 w-3" />
         <span>{timeString}</span>
       </div>
     )
   } else if (status === "completed") {
-    StatusIndicator = <CheckCircleIcon className="h-6 w-6 text-green-500" />
+    StatusIndicator = <CheckCircleIcon className="h-5 w-5 text-green-500" />
   } else if (!isAvailable) {
-    StatusIndicator = <LockClosedIcon className="h-5 w-5 text-zinc-400" />
+    StatusIndicator = <LockClosedIcon className="h-4 w-4 text-gray-400" />
   } else {
-    StatusIndicator = <ChevronRightIcon className="h-6 w-6 text-zinc-400" />
+    StatusIndicator = <ChevronRightIcon className="h-5 w-5 text-purple-300" />
+  }
+
+  // Определяем стили в зависимости от состояния
+  const getContainerStyles = () => {
+    if (status === "completed") {
+      return "border-green-500/30 bg-black/30"
+    }
+    if (!isAvailable) {
+      return "border-gray-600/30 bg-black/40"
+    }
+    return "border-purple-500/30 bg-black/20 hover:border-purple-400/50 hover:bg-black/40"
   }
 
   return (
     <div
       className={`
-        flex w-full max-w-sm items-center space-x-4 rounded-lg bg-zinc-600 p-3 shadow-md
-        ${
-          isDisabledVisual // Use isDisabledVisual for styling
-            ? "cursor-not-allowed opacity-60"
-            : "cursor-pointer transition-colors duration-150 ease-in-out hover:bg-zinc-500"
-        }
+        mb-2.5 flex w-full items-center space-x-3 rounded-lg border p-2.5 shadow-lg backdrop-blur-sm transition-all duration-200
+        ${getContainerStyles()}
+        ${isDisabledVisual ? "cursor-not-allowed opacity-80" : "cursor-pointer active:scale-98"}
       `}
-      // Call onClick only if it SHOULD open the drawer (available & not completed)
       aria-disabled={isDisabledVisual}
       data-task-id={id}
       role="button"
       tabIndex={isDisabledVisual ? -1 : 0}
       onClick={!isDisabledVisual && isAvailable ? () => onClick(id) : undefined}
     >
-      {/* ... rest of the TaskItem content (icon, title, reward) ... */}
-      {/* Круглая иконка-плейсхолдер слева */}
-      <div className="h-12 w-12 flex-shrink-0 rounded-full bg-zinc-400"></div>
-
-      {/* Текстовая информация (название и награда) */}
-      <div className="flex flex-grow flex-col">
-        <span className="text-base font-semibold leading-tight text-white">
-          {localizedName}
-        </span>
-        <span className="text-sm text-zinc-300">{`+${reward} tokens`}</span>
+      {/* Иконка задачи */}
+      <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-black/40 backdrop-blur-sm">
+        {getTaskIcon()}
       </div>
 
-      {/* Индикатор статуса/действия справа */}
-      <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center">
-        {StatusIndicator}
+      {/* Текстовая информация */}
+      <div className="flex flex-grow flex-col min-w-0">
+        <span className="truncate text-sm font-semibold leading-tight text-white">
+          {localizedName}
+        </span>
+        <span className="line-clamp-1 mt-0.5 text-2xs text-gray-300">
+          {localizedDescription}
+        </span>
+        <div className="mt-1 flex items-center text-xs text-purple-300">
+          <span className="mr-2 flex items-center">
+            <CurrencyDollarIcon className="mr-0.5 h-3 w-3" />
+            {reward}
+          </span>
+          {StatusIndicator}
+        </div>
       </div>
     </div>
   )

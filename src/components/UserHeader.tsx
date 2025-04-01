@@ -1,37 +1,78 @@
 import type { FC } from "react"
+import { SparklesIcon, TrophyIcon } from "@heroicons/react/24/solid"
+import { AnimatePresence, motion } from "framer-motion"
+import { useEffect, useState } from "react"
 
 import useBalanceStore from "@/hooks/balanceStore"
 
 const UserHeader: FC = () => {
   const { balance, income } = useBalanceStore()
+  const [animateBalance, setAnimateBalance] = useState(false)
+  
+  // Анимация при изменении баланса
+  useEffect(() => {
+    setAnimateBalance(true)
+    const timer = setTimeout(() => setAnimateBalance(false), 1000)
+    return () => clearTimeout(timer)
+  }, [balance])
 
   return (
-    <div className="mx-auto flex w-[27rem] items-center p-4">
-      {/* Аватар */}
-      <img
-        alt="Pavel"
-        className="h-16 w-16 rounded-full object-cover"
-        src="https://via.placeholder.com/150" // Замените на реальное изображение
-      />
-
-      <div className="ml-4 flex flex-col">
-        {/* Имя пользователя */}
-        <span className="text-xl font-bold text-black">Pavel Durov</span>
-
-        {/* Полоса со счётом (градиент) */}
-        <div className="relative mt-2 h-10 w-72 rounded-full bg-gradient-to-r from-purple-700 to-purple-500">
-          <span className="absolute inset-0 flex items-center justify-center text-lg font-semibold text-white">
-            {balance}
-          </span>
-
-          {/* Кружок с множителем (x1.3) */}
-          <div className="h-13 w-13 absolute right-0 top-0 flex -translate-y-1/4 translate-x-1/4 items-center justify-center rounded-full bg-purple-800">
-            <span className="text-sm text-white">x1.3</span>
+    <div className="relative mx-auto w-full max-w-md px-2 py-2">
+      {/* Фоновый градиент с размытием */}
+      <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-purple-900/80 via-indigo-900/70 to-purple-900/80 shadow-lg backdrop-blur-md"></div>
+      
+      {/* Декоративные элементы */}
+      <div className="absolute -right-2 -top-2 h-16 w-16 rounded-full bg-purple-500/20 blur-xl"></div>
+      <div className="absolute -bottom-2 -left-2 h-12 w-12 rounded-full bg-indigo-500/20 blur-lg"></div>
+      
+      {/* Основной контент */}
+      <div className="relative flex items-center justify-between px-3 py-2">
+        {/* Аватар пользователя */}
+        <div className="relative h-12 w-12 shrink-0">
+          <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-purple-500 to-indigo-500 opacity-70 blur-sm"></div>
+          <img
+            alt="Аватар"
+            className="relative h-12 w-12 rounded-full border-2 border-white/30 object-cover"
+            src="https://via.placeholder.com/150"
+          />
+          <div className="absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-purple-600 text-[10px] font-bold text-white shadow-lg">
+            5
           </div>
         </div>
 
-        {/* Скорость */}
-        <span className="mt-1 text-sm text-white">+{income}/sec</span>
+        {/* Средняя часть - Баланс и доход */}
+        <motion.div
+          animate={{ scale: animateBalance ? 1.05 : 1 }}
+          className="mx-3 flex-1 rounded-lg bg-gradient-to-r from-purple-900/60 to-indigo-900/60 p-2 text-center shadow-inner"
+          transition={{ type: "spring", stiffness: 500, damping: 15 }}
+        >
+          <div className="flex flex-col items-center">
+            <div className="flex items-center gap-1">
+              <SparklesIcon className="h-4 w-4 text-purple-300" />
+              <motion.span 
+                animate={{ scale: animateBalance ? 1.1 : 1 }}
+                className="text-xl font-bold text-white"
+                transition={{ type: "spring", stiffness: 500, damping: 15 }}
+              >
+                {balance.toLocaleString()}
+              </motion.span>
+            </div>
+            <div className="mt-0.5 flex items-center gap-1 text-xs text-purple-300">
+              <span className="text-green-400">+{income}/сек</span>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Правая часть - Множитель и бонусы */}
+        <div className="flex flex-col items-end gap-1">
+          <div className="flex h-8 items-center justify-center rounded-full bg-gradient-to-r from-purple-700 to-indigo-600 px-3 text-sm font-bold text-white shadow-md">
+            <span>×{(1.3).toFixed(1)}</span>
+          </div>
+          <div className="flex items-center gap-1 text-xs text-purple-200">
+            <TrophyIcon className="h-3 w-3 text-yellow-400" />
+            <span>Ранг 3</span>
+          </div>
+        </div>
       </div>
     </div>
   )
