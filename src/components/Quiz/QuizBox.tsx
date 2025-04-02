@@ -9,6 +9,7 @@ import { motion } from "framer-motion"
 import { useEffect, useState } from "react"
 
 import ConfirmModal from "./ConfirmModal"
+
 import useBalanceStore from "@/hooks/balanceStore"
 import { useQuizStore } from "@/hooks/quizStore"
 
@@ -111,7 +112,13 @@ interface QuizBoxProps {
 const QuizBox: FC<QuizBoxProps> = ({ quizId, onClose }) => {
   const {
     progress,
-    actions: { setProgress, clearProgress, setQuizFinished, clearSelection, updateQuizResult },
+    actions: {
+      setProgress,
+      clearProgress,
+      setQuizFinished,
+      clearSelection,
+      updateQuizResult,
+    },
   } = useQuizStore()
   const [questions, setQuestions] = useState<Question[]>([])
   const [submitting, setSubmitting] = useState(false)
@@ -226,13 +233,13 @@ const QuizBox: FC<QuizBoxProps> = ({ quizId, onClose }) => {
       reward: 0,
       score: 0,
     }
-    
+
     // Обновляем результат в store
     updateQuizResult(quizId, quizResult)
     setQuizFinished(true)
     onClose()
   }
-  
+
   // Обработчик закрытия викторины
   const handleClose = () => {
     if (!result) {

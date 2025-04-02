@@ -44,10 +44,11 @@ const CorridorConfirmDrawer = ({
             <DrawerHeader>
               <DrawerTitle>Создание коридора</DrawerTitle>
               <DrawerDescription>
-                Вы хотите добавить новый коридор в направлении &quot;{confirmDrawerContext.direction}&quot;?
+                Вы хотите добавить новый коридор в направлении &quot;
+                {confirmDrawerContext.direction}&quot;?
               </DrawerDescription>
             </DrawerHeader>
-            
+
             <div className="px-6">
               <div className="rounded-lg border border-purple-800/20 bg-purple-900/20 p-4">
                 <div className="mb-3 flex items-center space-x-3">
@@ -67,9 +68,9 @@ const CorridorConfirmDrawer = ({
                 </p>
               </div>
             </div>
-            
+
             <DrawerFooter>
-              <button 
+              <button
                 className="w-full rounded-md bg-gradient-to-r from-green-800 to-teal-800 py-2.5 text-sm font-medium text-white shadow-md transition-all hover:from-green-700 hover:to-teal-700 active:translate-y-0.5"
                 onClick={handleConfirmCorridor}
               >

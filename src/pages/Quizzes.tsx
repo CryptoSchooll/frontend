@@ -11,7 +11,7 @@ const Quizzes: FC = () => {
         <div className="absolute -left-10 bottom-10 h-96 w-96 rounded-full bg-purple-700/10 blur-3xl"></div>
         <div className="absolute bottom-40 right-0 h-64 w-64 rounded-full bg-pink-700/5 blur-3xl"></div>
       </div>
-      
+
       {/* Заголовок и описание */}
       <div className="relative mb-4 text-center">
         <h1 className="text-2xl font-bold text-white">Викторины</h1>
@@ -19,7 +19,7 @@ const Quizzes: FC = () => {
           Проверьте свои знания и получите награды
         </p>
       </div>
-      
+
       {/* Статистика и достижения - адаптивная сетка */}
       <div className="relative mb-4 grid grid-cols-2 gap-2">
         <div className="rounded-xl bg-gradient-to-br from-purple-900/20 to-purple-700/20 p-3 backdrop-blur-sm">
@@ -37,10 +37,12 @@ const Quizzes: FC = () => {
           </div>
         </div>
       </div>
-      
+
       {/* Список доступных викторин */}
-      <div className="relative flex-1 overflow-y-auto pb-16">
-        <h2 className="mb-3 text-lg font-semibold text-white">Доступные викторины</h2>
+      <div className="scrollbar-none relative flex-1 overflow-y-auto pb-16">
+        <h2 className="mb-3 text-lg font-semibold text-white">
+          Доступные викторины
+        </h2>
         <QuizList />
       </div>
     </div>

@@ -82,7 +82,7 @@ const AppLayout: React.FC = () => {
       </header>
 
       {/* Прокручиваемое содержимое */}
-      <main className="scrollbar-hide flex-1 overflow-y-auto px-4">
+      <main className="scrollbar-none flex-1 overflow-y-auto px-4">
         <div className="mx-auto w-full max-w-md pb-24">{pageContent}</div>
       </main>
 

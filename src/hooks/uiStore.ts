@@ -12,8 +12,17 @@ export type ConfirmDrawerContext = {
 }
 
 export type ClassInfoContext = {
-  classData: Class
-  corridorId: string
+  classId: string
+}
+
+export type QuizContext = {
+  quizId: string
+}
+
+export type QuizConfirmContext = {
+  quizId: string
+  title: string
+  actionType: "start" | "continue" | "exit"
 }
 
 export type UIStore = {
@@ -26,6 +35,12 @@ export type UIStore = {
   isClassInfoOpen: boolean
   classInfoContext: ClassInfoContext | null
 
+  isQuizActive: boolean
+  quizContext: QuizContext | null
+
+  isQuizConfirmOpen: boolean
+  quizConfirmContext: QuizConfirmContext | null
+
   actions: {
     openShopDrawer: (context: ShopDrawerContext) => void
     closeShopDrawer: () => void
@@ -33,6 +48,10 @@ export type UIStore = {
     closeConfirmDrawer: () => void
     openClassInfo: (context: ClassInfoContext) => void
     closeClassInfo: () => void
+    openQuiz: (context: QuizContext) => void
+    closeQuiz: () => void
+    openQuizConfirm: (context: QuizConfirmContext) => void
+    closeQuizConfirm: () => void
   }
 }
 
@@ -43,6 +62,10 @@ export const useUIStore = create<UIStore>((set) => ({
   confirmDrawerContext: null,
   isClassInfoOpen: false,
   classInfoContext: null,
+  isQuizActive: false,
+  quizContext: null,
+  isQuizConfirmOpen: false,
+  quizConfirmContext: null,
 
   actions: {
     openShopDrawer: (context) =>
@@ -65,6 +88,14 @@ export const useUIStore = create<UIStore>((set) => ({
       set({ isClassInfoOpen: true, classInfoContext: context }),
     closeClassInfo: () =>
       set({ isClassInfoOpen: false, classInfoContext: null }),
+
+    openQuiz: (context) => set({ isQuizActive: true, quizContext: context }),
+    closeQuiz: () => set({ isQuizActive: false, quizContext: null }),
+
+    openQuizConfirm: (context) =>
+      set({ isQuizConfirmOpen: true, quizConfirmContext: context }),
+    closeQuizConfirm: () =>
+      set({ isQuizConfirmOpen: false, quizConfirmContext: null }),
 
     // closeAllDrawers: () =>
     //   set({

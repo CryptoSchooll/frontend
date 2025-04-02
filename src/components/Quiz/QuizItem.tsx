@@ -1,4 +1,5 @@
 import type { FC } from "react"
+
 import { CheckCircle, Crown, Lock, TrendingUp } from "lucide-react"
 
 interface QuizItemProps {
@@ -47,13 +48,13 @@ const QuizItem: FC<QuizItemProps> = ({
   // Отображаем полосу прогресса для завершенных викторин
   const ProgressBar = () => {
     if (!isCompleted) return null
-    
+
     const percent = (correctAnswers / tasksCount) * 100
-    
+
     return (
       <div className="mt-2 h-1 w-full overflow-hidden rounded-full bg-black/30">
-        <div 
-          className="h-full rounded-full bg-green-500" 
+        <div
+          className="h-full rounded-full bg-green-500"
           style={{ width: `${percent}%` }}
         />
       </div>
@@ -61,14 +62,16 @@ const QuizItem: FC<QuizItemProps> = ({
   }
 
   return (
-    <div className={`
+    <div
+      className={`
       mb-2 rounded-lg border p-3 shadow-lg backdrop-blur-sm
       ${getContainerStyles()}
       transition-all duration-200
-    `}>
+    `}
+    >
       <div className="flex items-center justify-between">
         {/* Левая часть - иконка и название */}
-        <div className="flex items-center space-x-3 min-w-0">
+        <div className="flex min-w-0 items-center space-x-3">
           <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-black/40 backdrop-blur-sm">
             <StatusIcon />
           </div>
@@ -78,7 +81,9 @@ const QuizItem: FC<QuizItemProps> = ({
             </div>
             <div className="text-xs text-purple-300">
               {isCompleted ? (
-                <span>Ответов: {correctAnswers}/{tasksCount}</span>
+                <span>
+                  Ответов: {correctAnswers}/{tasksCount}
+                </span>
               ) : isLocked ? (
                 <span>Заблокировано</span>
               ) : (
@@ -87,20 +92,20 @@ const QuizItem: FC<QuizItemProps> = ({
             </div>
           </div>
         </div>
-        
+
         {/* Правая часть - статус или стрелка */}
         <div className="ml-2 flex-shrink-0">
           {!isLocked && !isCompleted && (
             <TrendingUp className="h-5 w-5 text-purple-400" />
           )}
           {isCompleted && (
-            <div className="rounded-full bg-green-900/20 px-2 py-0.5 text-2xs font-medium text-green-400">
+            <div className="text-2xs rounded-full bg-green-900/20 px-2 py-0.5 font-medium text-green-400">
               Пройдено
             </div>
           )}
         </div>
       </div>
-      
+
       {/* Полоса прогресса */}
       <ProgressBar />
     </div>

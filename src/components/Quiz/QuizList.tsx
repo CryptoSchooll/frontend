@@ -1,11 +1,10 @@
 import { motion } from "framer-motion"
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 
-import ConfirmModal from "./ConfirmModal"
-import QuizBox from "./QuizBox"
 import QuizItem from "./QuizItem"
 
 import { useQuizStore } from "@/hooks/quizStore"
+import { useUIStore } from "@/hooks/uiStore"
 
 // Оптимизированные анимации для мобильных устройств
 const containerVariants = {
@@ -41,69 +40,70 @@ const QuizList: React.FC = () => {
     quizFinished,
     loading,
     error,
-    actions: { selectQuiz, clearSelection, clearProgress },
+    actions: { selectQuiz, clearProgress },
   } = useQuizStore()
 
-  const [showQuiz, setShowQuiz] = useState(false)
-  const [showContinueModal, setShowContinueModal] = useState(false)
-  const [hasCheckedProgress, setHasCheckedProgress] = useState(false)
+  const { openQuizConfirm } = useUIStore((state) => state.actions)
+  const [hasInitialized, setHasInitialized] = useState(false)
+  const userSelectedQuizId = useRef<string | null>(null)
 
-  // Обработка состояния прогресса при загрузке
+  // Загрузка при первой инициализации
   useEffect(() => {
-    if (!hasCheckedProgress && !loading) {
-      // Проверяем наличие сохраненного прогресса и выбранной викторины
+    if (loading) {
+      return
+    }
+
+    if (!hasInitialized) {
+      setHasInitialized(true)
+
+      // Проверяем наличие и статус прогресса
       if (progress && selectedQuiz && !quizFinished) {
-        // Если есть прогресс и викторина не завершена, показываем модальное окно
-        setShowContinueModal(true)
-      } else if (selectedQuiz && !progress) {
-        // Если есть выбранная викторина, но нет прогресса, показываем окно подтверждения
-        setShowQuiz(true)
+        // Продолжение существующей викторины
+        openQuizConfirm({
+          quizId: selectedQuiz.id,
+          title: selectedQuiz.title,
+          actionType: "continue",
+        })
       }
-      setHasCheckedProgress(true)
+    } else if (userSelectedQuizId.current && selectedQuiz) {
+      // Пользователь только что выбрал викторину
+      if (selectedQuiz.id === userSelectedQuizId.current) {
+        openQuizConfirm({
+          quizId: selectedQuiz.id,
+          title: selectedQuiz.title,
+          actionType: "start",
+        })
+        userSelectedQuizId.current = null
+      }
     }
-  }, [progress, selectedQuiz, quizFinished, loading, hasCheckedProgress])
+  }, [
+    loading,
+    hasInitialized,
+    progress,
+    selectedQuiz,
+    quizFinished,
+    openQuizConfirm,
+  ])
 
-  // Если состояние из store сброшено, то сбрасываем и локальное состояние модалки
+  // Сброс состояния при очистке выбора
   useEffect(() => {
-    if (!progress && !selectedQuiz) {
-      setShowContinueModal(false)
-      setShowQuiz(false)
+    if (!selectedQuiz) {
+      userSelectedQuizId.current = null
     }
-  }, [progress, selectedQuiz])
+  }, [selectedQuiz])
 
-  // Обработчики действий
+  // Обработчик выбора викторины
   const handleQuizClick = useCallback(
     (quizId: string) => {
       const quiz = quizzes.find((q) => q.id === quizId)
-      if (quiz) {
-        selectQuiz(quiz)
-        clearProgress()
-        // Не открываем викторину сразу, подтверждение откроется через условный рендеринг
-      }
+      if (!quiz) return
+
+      clearProgress()
+      userSelectedQuizId.current = quizId
+      selectQuiz(quiz)
     },
     [quizzes, selectQuiz, clearProgress],
   )
-
-  const handleConfirmNew = useCallback(() => {
-    setShowQuiz(true)
-  }, [])
-
-  const handleContinueConfirm = useCallback(() => {
-    setShowContinueModal(false)
-    setShowQuiz(true)
-  }, [])
-
-  const handleContinueCancel = useCallback(() => {
-    setShowContinueModal(false)
-    clearProgress()
-    clearSelection()
-  }, [clearProgress, clearSelection])
-
-  const handleCollectReward = useCallback(() => {
-    clearProgress()
-    clearSelection()
-    setShowQuiz(false)
-  }, [clearProgress, clearSelection])
 
   // Состояния загрузки и ошибок - компактные версии для мобильных устройств
   if (loading) {
@@ -162,26 +162,6 @@ const QuizList: React.FC = () => {
           </motion.div>
         )
       })}
-
-      {showContinueModal && (
-        <ConfirmModal
-          message="Продолжить незавершенную викторину?"
-          onCancel={handleContinueCancel}
-          onConfirm={handleContinueConfirm}
-        />
-      )}
-
-      {selectedQuiz && !showQuiz && !showContinueModal && (
-        <ConfirmModal
-          message={`Начать викторину "${selectedQuiz.title || `Викторина ${selectedQuiz.id}`}"?`}
-          onCancel={clearSelection}
-          onConfirm={handleConfirmNew}
-        />
-      )}
-
-      {showQuiz && selectedQuiz && (
-        <QuizBox quizId={selectedQuiz.id} onClose={handleCollectReward} />
-      )}
     </motion.div>
   )
 }

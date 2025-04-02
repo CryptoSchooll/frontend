@@ -66,7 +66,7 @@ const TaskConfirmDrawer: FC<TaskConfirmDrawerProps> = ({
             <h4 className="mb-2 font-medium text-purple-300">
               Действия для получения награды:
             </h4>
-            
+
             <div className="space-y-4">
               <div>
                 <button

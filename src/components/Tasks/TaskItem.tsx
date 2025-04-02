@@ -9,7 +9,11 @@ import {
   ClockIcon,
   LockClosedIcon,
 } from "@heroicons/react/24/outline"
-import { CurrencyDollarIcon, FireIcon, StarIcon } from "@heroicons/react/24/solid"
+import {
+  CurrencyDollarIcon,
+  FireIcon,
+  StarIcon,
+} from "@heroicons/react/24/solid"
 
 interface TaskItemProps extends Task {
   onClick: (taskId: string) => void
@@ -81,12 +85,12 @@ const TaskItem: FC<TaskItemProps> = ({
 
   return (
     <div
+      aria-disabled={isDisabledVisual}
       className={`
         mb-2.5 flex w-full items-center space-x-3 rounded-lg border p-2.5 shadow-lg backdrop-blur-sm transition-all duration-200
         ${getContainerStyles()}
-        ${isDisabledVisual ? "cursor-not-allowed opacity-80" : "cursor-pointer active:scale-98"}
+        ${isDisabledVisual ? "cursor-not-allowed opacity-80" : "active:scale-98 cursor-pointer"}
       `}
-      aria-disabled={isDisabledVisual}
       data-task-id={id}
       role="button"
       tabIndex={isDisabledVisual ? -1 : 0}
@@ -98,11 +102,11 @@ const TaskItem: FC<TaskItemProps> = ({
       </div>
 
       {/* Текстовая информация */}
-      <div className="flex flex-grow flex-col min-w-0">
+      <div className="flex min-w-0 flex-grow flex-col">
         <span className="truncate text-sm font-semibold leading-tight text-white">
           {localizedName}
         </span>
-        <span className="line-clamp-1 mt-0.5 text-2xs text-gray-300">
+        <span className="text-2xs mt-0.5 line-clamp-1 text-gray-300">
           {localizedDescription}
         </span>
         <div className="mt-1 flex items-center text-xs text-purple-300">

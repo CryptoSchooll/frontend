@@ -84,7 +84,7 @@ const DonationShop: FC = () => {
             </span>
           </div>
         </div>
-        <div className="space-y-4">
+        <div className="scrollbar-none space-y-4 overflow-y-auto">
           {donationPackages.map((pkg) => (
             <motion.div
               key={pkg.id}
