@@ -46,19 +46,28 @@ const QuizList: React.FC = () => {
 
   const [showQuiz, setShowQuiz] = useState(false)
   const [showContinueModal, setShowContinueModal] = useState(false)
+  const [hasCheckedProgress, setHasCheckedProgress] = useState(false)
 
-  // Обработка состояния прогресса
+  // Обработка состояния прогресса при загрузке
   useEffect(() => {
-    if (progress && selectedQuiz && !quizFinished) {
-      setShowContinueModal(true)
-    } else {
-      setShowContinueModal(false)
+    if (!hasCheckedProgress && !loading) {
+      // Проверяем наличие сохраненного прогресса и выбранной викторины
+      if (progress && selectedQuiz && !quizFinished) {
+        // Если есть прогресс и викторина не завершена, показываем модальное окно
+        setShowContinueModal(true)
+      } else if (selectedQuiz && !progress) {
+        // Если есть выбранная викторина, но нет прогресса, показываем окно подтверждения
+        setShowQuiz(true)
+      }
+      setHasCheckedProgress(true)
     }
-  }, [progress, selectedQuiz, quizFinished])
+  }, [progress, selectedQuiz, quizFinished, loading, hasCheckedProgress])
 
+  // Если состояние из store сброшено, то сбрасываем и локальное состояние модалки
   useEffect(() => {
     if (!progress && !selectedQuiz) {
       setShowContinueModal(false)
+      setShowQuiz(false)
     }
   }, [progress, selectedQuiz])
 
@@ -69,6 +78,7 @@ const QuizList: React.FC = () => {
       if (quiz) {
         selectQuiz(quiz)
         clearProgress()
+        // Не открываем викторину сразу, подтверждение откроется через условный рендеринг
       }
     },
     [quizzes, selectQuiz, clearProgress],
@@ -103,7 +113,7 @@ const QuizList: React.FC = () => {
       </div>
     )
   }
-  
+
   if (error) {
     return (
       <div className="rounded-lg bg-red-900/20 p-3 text-center backdrop-blur-sm">
@@ -122,9 +132,9 @@ const QuizList: React.FC = () => {
 
   return (
     <motion.div
+      animate="visible"
       className="space-y-1"
       initial="hidden"
-      animate="visible"
       variants={containerVariants}
     >
       {quizzes.map((quiz) => {
@@ -133,8 +143,8 @@ const QuizList: React.FC = () => {
         return (
           <motion.div
             key={quiz.id}
-            variants={itemVariants}
             className={isDisabled ? "opacity-60" : ""}
+            variants={itemVariants}
             onClick={() => {
               if (!isDisabled) {
                 handleQuizClick(quiz.id)
@@ -153,14 +163,6 @@ const QuizList: React.FC = () => {
         )
       })}
 
-      {selectedQuiz && !showQuiz && !showContinueModal && (
-        <ConfirmModal
-          message={`Начать викторину "${selectedQuiz.title || `Викторина ${selectedQuiz.id}`}"?`}
-          onCancel={clearSelection}
-          onConfirm={handleConfirmNew}
-        />
-      )}
-
       {showContinueModal && (
         <ConfirmModal
           message="Продолжить незавершенную викторину?"
@@ -169,8 +171,16 @@ const QuizList: React.FC = () => {
         />
       )}
 
+      {selectedQuiz && !showQuiz && !showContinueModal && (
+        <ConfirmModal
+          message={`Начать викторину "${selectedQuiz.title || `Викторина ${selectedQuiz.id}`}"?`}
+          onCancel={clearSelection}
+          onConfirm={handleConfirmNew}
+        />
+      )}
+
       {showQuiz && selectedQuiz && (
-        <QuizBox onClose={handleCollectReward} quizId={selectedQuiz.id} />
+        <QuizBox quizId={selectedQuiz.id} onClose={handleCollectReward} />
       )}
     </motion.div>
   )

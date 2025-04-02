@@ -1,7 +1,15 @@
 import { Navbar, UserHeader } from "@/components"
 import { GlobalUI } from "@/components/GlobalUI"
 import usePage from "@/hooks/usePage"
-import { Broadcast, Club, Home, Leaderboard, Quizzes, Tasks } from "@/pages"
+import {
+  Broadcast,
+  Club,
+  DonationShop,
+  Home,
+  Leaderboard,
+  Quizzes,
+  Tasks,
+} from "@/pages"
 
 const AppLayout: React.FC = () => {
   const { currentPage } = usePage()
@@ -36,7 +44,7 @@ const AppLayout: React.FC = () => {
           </div>
         </div>
 
-        <GlobalDrawers />
+        <GlobalUI />
       </div>
     )
   }
@@ -59,6 +67,9 @@ const AppLayout: React.FC = () => {
     case "leaderboard":
       pageContent = <Leaderboard />
       break
+    case "donationShop":
+      pageContent = <DonationShop />
+      break
     default:
       pageContent = <div>Страница не найдена</div>
   }
@@ -70,22 +81,8 @@ const AppLayout: React.FC = () => {
         <UserHeader />
       </header>
 
-      {/* Заголовок страницы */}
-      {currentPage === "quizzes" && (
-        <div className="z-10 px-4 pb-3 pt-2 text-center">
-          <h1 className="text-2xl font-bold text-white">Quiz</h1>
-        </div>
-      )}
-
-      {/* Заголовок для страницы лидерборда */}
-      {currentPage === "leaderboard" && (
-        <div className="z-10 px-4 pb-3 pt-2 text-center">
-          <h1 className="text-2xl font-bold text-white">Таблица лидеров</h1>
-        </div>
-      )}
-
       {/* Прокручиваемое содержимое */}
-      <main className="flex-1 overflow-y-auto px-4">
+      <main className="scrollbar-hide flex-1 overflow-y-auto px-4">
         <div className="mx-auto w-full max-w-md pb-24">{pageContent}</div>
       </main>
 

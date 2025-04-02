@@ -1,9 +1,14 @@
 import type { FC } from "react"
 
-import { CheckCircleIcon, ClockIcon, XCircleIcon } from "@heroicons/react/24/solid"
+import {
+  CheckCircleIcon,
+  ClockIcon,
+  XCircleIcon,
+} from "@heroicons/react/24/solid"
 import { motion } from "framer-motion"
 import { useEffect, useState } from "react"
 
+import ConfirmModal from "./ConfirmModal"
 import useBalanceStore from "@/hooks/balanceStore"
 import { useQuizStore } from "@/hooks/quizStore"
 
@@ -35,7 +40,7 @@ interface Answer {
   answerTime: number
 }
 
-const fetchQuizQuestions = async (quizId: string): Promise<Question[]> => {
+const fetchQuizQuestions = async (_quizId: string): Promise<Question[]> => {
   await new Promise((resolve) => setTimeout(resolve, 500))
   return [
     {
@@ -66,7 +71,7 @@ const fetchQuizQuestions = async (quizId: string): Promise<Question[]> => {
 const submitQuizAnswers = async (
   _quizId: string,
   answers: Answer[],
-  _totalCompletionTime: number,
+  _totalTime: number,
 ): Promise<QuizSubmitResponse> => {
   await new Promise((resolve) => setTimeout(resolve, 500))
   const reward = 1000
@@ -106,12 +111,13 @@ interface QuizBoxProps {
 const QuizBox: FC<QuizBoxProps> = ({ quizId, onClose }) => {
   const {
     progress,
-    actions: { setProgress, clearProgress, setQuizFinished, clearSelection },
+    actions: { setProgress, clearProgress, setQuizFinished, clearSelection, updateQuizResult },
   } = useQuizStore()
   const [questions, setQuestions] = useState<Question[]>([])
   const [submitting, setSubmitting] = useState(false)
   const [result, setResult] = useState<QuizSubmitResponse | null>(null)
   const [timeLeft, setTimeLeft] = useState(0)
+  const [showExitConfirm, setShowExitConfirm] = useState(false)
 
   // При монтировании загружаем вопросы и инициализируем прогресс, если его ещё нет
   useEffect(() => {
@@ -141,7 +147,7 @@ const QuizBox: FC<QuizBoxProps> = ({ quizId, onClose }) => {
     const limit = currentQuestion.timeLimit
 
     const interval = setInterval(() => {
-      const elapsed = (Date.now() - questionStart) / 1000
+      const elapsed = Math.floor((Date.now() - questionStart) / 1000)
       const remaining = Math.max(limit - elapsed, 0)
       setTimeLeft(remaining)
       if (remaining === 0) {
@@ -149,7 +155,7 @@ const QuizBox: FC<QuizBoxProps> = ({ quizId, onClose }) => {
         // Автоматически засчитываем вопрос как неправильный, вызывая handleAnswer с пустым значением
         handleAnswer("")
       }
-    }, 100)
+    }, 1000) // Обновляем каждую секунду вместо 100мс
 
     return () => clearInterval(interval)
   }, [progress, currentQuestion])
@@ -201,14 +207,51 @@ const QuizBox: FC<QuizBoxProps> = ({ quizId, onClose }) => {
 
   // Получаем цвет таймера в зависимости от оставшегося времени
   const getTimerColor = () => {
-    if (timePercentage > 60) return "bg-gradient-to-r from-emerald-500 to-teal-400"
-    if (timePercentage > 30) return "bg-gradient-to-r from-amber-500 to-yellow-400"
+    if (timePercentage > 60)
+      return "bg-gradient-to-r from-emerald-500 to-teal-400"
+    if (timePercentage > 30)
+      return "bg-gradient-to-r from-amber-500 to-yellow-400"
     return "bg-gradient-to-r from-red-500 to-rose-400"
+  }
+
+  // Обработчик подтверждения выхода
+  const handleConfirmExit = () => {
+    // Создаем результат с нулевым количеством правильных ответов
+    const quizResult = {
+      id: crypto.randomUUID(),
+      quizId,
+      completedAt: new Date().toISOString(),
+      correctAnswers: 0,
+      totalQuestions: questions.length,
+      reward: 0,
+      score: 0,
+    }
+    
+    // Обновляем результат в store
+    updateQuizResult(quizId, quizResult)
+    setQuizFinished(true)
+    onClose()
+  }
+  
+  // Обработчик закрытия викторины
+  const handleClose = () => {
+    if (!result) {
+      setShowExitConfirm(true)
+    } else {
+      onClose()
+    }
   }
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/40 backdrop-blur-md">
-      <motion.div 
+      {showExitConfirm && (
+        <ConfirmModal
+          message="Вы уверены, что хотите выйти? Викторина будет считаться завершенной с нулевым результатом."
+          onCancel={() => setShowExitConfirm(false)}
+          onConfirm={handleConfirmExit}
+        />
+      )}
+      <motion.div
         animate={{ opacity: 1, y: 0 }}
         className="relative w-full max-w-md rounded-xl bg-gradient-to-b from-gray-900 to-purple-950 p-5 shadow-[0_0_25px_rgba(139,92,246,0.3)]"
         initial={{ opacity: 0, y: 20 }}
@@ -222,8 +265,10 @@ const QuizBox: FC<QuizBoxProps> = ({ quizId, onClose }) => {
             initial={{ opacity: 0, y: 10 }}
             transition={{ delay: 0.1, duration: 0.3 }}
           >
-            <h2 className="mb-4 text-center text-2xl font-bold text-white">Результаты</h2>
-            
+            <h2 className="mb-4 text-center text-2xl font-bold text-white">
+              Результаты
+            </h2>
+
             {/* Круговой индикатор с результатами */}
             <div className="relative mb-5 flex h-32 w-32 items-center justify-center rounded-full bg-purple-900/50 p-1">
               <div className="z-10 flex h-full w-full flex-col items-center justify-center rounded-full bg-gradient-to-b from-purple-800 to-purple-900 text-center">
@@ -234,20 +279,24 @@ const QuizBox: FC<QuizBoxProps> = ({ quizId, onClose }) => {
                   {result.correctAnswers}/{result.totalQuestions} верно
                 </span>
               </div>
-              
+
               {/* Внешний светящийся круг */}
               <div className="absolute inset-0 rounded-full bg-gradient-to-r from-purple-500 to-purple-600 opacity-30 blur-sm"></div>
             </div>
-            
+
             {/* Награда */}
             <div className="my-4 rounded-lg bg-gradient-to-r from-purple-900/60 to-indigo-900/60 p-3 text-center">
               <p className="mb-1 text-sm text-purple-300">Ваша награда</p>
-              <p className="text-2xl font-bold text-yellow-400">{result.reward}</p>
+              <p className="text-2xl font-bold text-yellow-400">
+                {result.reward}
+              </p>
             </div>
-            
+
             {/* Новый баланс */}
-            <p className="mb-6 text-sm text-gray-400">Новый баланс: {result.updatedBalance}</p>
-            
+            <p className="mb-6 text-sm text-gray-400">
+              Новый баланс: {result.updatedBalance}
+            </p>
+
             <motion.button
               className="w-full rounded-lg bg-gradient-to-r from-purple-600 to-purple-500 py-3 font-medium text-white shadow-lg"
               whileHover={{ scale: 1.02 }}
@@ -268,9 +317,9 @@ const QuizBox: FC<QuizBoxProps> = ({ quizId, onClose }) => {
           // Загрузка вопросов
           <div className="flex flex-col items-center py-10">
             <motion.div
-              animate={{ 
-                rotate: 360, 
-                transition: { duration: 1.5, repeat: Infinity, ease: "linear" }
+              animate={{
+                rotate: 360,
+                transition: { duration: 1.5, repeat: Infinity, ease: "linear" },
               }}
               className="mb-4 h-12 w-12 rounded-full border-4 border-purple-600 border-t-transparent"
             />
@@ -280,9 +329,9 @@ const QuizBox: FC<QuizBoxProps> = ({ quizId, onClose }) => {
           // Отправка ответов
           <div className="flex flex-col items-center py-10">
             <motion.div
-              animate={{ 
-                rotate: 360, 
-                transition: { duration: 1.5, repeat: Infinity, ease: "linear" }
+              animate={{
+                rotate: 360,
+                transition: { duration: 1.5, repeat: Infinity, ease: "linear" },
               }}
               className="mb-4 h-12 w-12 rounded-full border-4 border-purple-600 border-t-transparent"
             />
@@ -294,11 +343,13 @@ const QuizBox: FC<QuizBoxProps> = ({ quizId, onClose }) => {
             {/* Таймер */}
             <div className="mb-6">
               <div className="flex items-center justify-between">
-                <p className="mb-2 text-xs text-gray-400">Вопрос {currentIndex + 1} из {questions.length}</p>
+                <p className="mb-2 text-xs text-gray-400">
+                  Вопрос {currentIndex + 1} из {questions.length}
+                </p>
                 <div className="flex items-center">
                   <ClockIcon className="mr-1 h-4 w-4 text-gray-400" />
                   <p className="text-sm font-medium text-gray-400">
-                    {Math.floor(timeLeft)}:{((timeLeft % 1) * 10).toFixed(0).padStart(1, "0")}
+                    {Math.floor(timeLeft)} сек
                   </p>
                 </div>
               </div>
@@ -311,17 +362,22 @@ const QuizBox: FC<QuizBoxProps> = ({ quizId, onClose }) => {
                 />
               </div>
             </div>
-            
+
             {/* Текст вопроса */}
-            <h2 className="mb-5 text-xl font-medium text-white">{currentQuestion?.text}</h2>
-            
+            <h2 className="mb-5 text-xl font-medium text-white">
+              {currentQuestion?.text}
+            </h2>
+
             {/* Варианты ответов */}
             <div className="flex flex-col space-y-3">
               {currentQuestion?.options.map((option) => (
                 <motion.button
                   key={option.id}
                   className="group w-full rounded-lg border border-purple-800 bg-gradient-to-r from-purple-900/50 to-purple-800/50 px-4 py-3 text-left text-purple-100 transition-all"
-                  whileHover={{ scale: 1.02, backgroundColor: "rgba(168, 85, 247, 0.2)" }}
+                  whileHover={{
+                    scale: 1.02,
+                    backgroundColor: "rgba(168, 85, 247, 0.2)",
+                  }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => handleAnswer(option.id)}
                 >
@@ -338,7 +394,7 @@ const QuizBox: FC<QuizBoxProps> = ({ quizId, onClose }) => {
             className="absolute -right-2 -top-2 flex h-8 w-8 items-center justify-center rounded-full bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white"
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
-            onClick={onClose}
+            onClick={handleClose}
           >
             <XCircleIcon className="h-6 w-6" />
           </motion.button>

@@ -7,6 +7,7 @@ type PageType =
   | "tasks"
   | "club"
   | "leaderboard"
+  | "donationShop"
 
 interface PageStore {
   currentPage: PageType

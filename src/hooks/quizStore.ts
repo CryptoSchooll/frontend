@@ -150,6 +150,7 @@ export const useQuizStore = create<QuizStore>()(
         quizzes: state.quizzes,
         progress: state.progress,
         quizFinished: state.quizFinished,
+        selectedQuiz: state.selectedQuiz,
       }),
     },
   ),

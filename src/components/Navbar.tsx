@@ -1,7 +1,5 @@
 import type { FC } from "react"
 
-import { motion } from "framer-motion"
-import { useEffect, useState } from "react"
 import {
   BookOpenIcon,
   HomeIcon,
@@ -9,6 +7,8 @@ import {
   TrophyIcon,
   UserGroupIcon,
 } from "@heroicons/react/24/outline"
+import { motion } from "framer-motion"
+import { useEffect, useState } from "react"
 
 import usePage from "@/hooks/usePage"
 
@@ -51,7 +51,7 @@ const Navbar: FC = () => {
     <nav className="fixed bottom-4 left-1/2 z-50 w-full max-w-lg -translate-x-1/2 transform rounded-full shadow-xl">
       {/* Фоновый градиент с размытием */}
       <div className="absolute inset-0 rounded-full bg-gradient-to-r from-gray-900/90 via-purple-950/90 to-gray-900/90 shadow-lg backdrop-blur-md"></div>
-      
+
       <div className="relative">
         <ul className="mx-auto grid h-16 grid-cols-5 font-medium">
           {/* 1) Задания (tasks) */}
@@ -65,8 +65,12 @@ const Navbar: FC = () => {
               whileTap="tap"
               onClick={() => switchPage("tasks")}
             >
-              <SparklesIcon className={`h-5 w-5 transition-colors ${currentPage === "tasks" ? "text-purple-400" : "text-gray-300"}`} />
-              <span className={`mt-1 text-xs transition-colors ${currentPage === "tasks" ? "text-purple-300" : "text-gray-400"}`}>
+              <SparklesIcon
+                className={`h-5 w-5 transition-colors ${currentPage === "tasks" ? "text-purple-400" : "text-gray-300"}`}
+              />
+              <span
+                className={`mt-1 text-xs transition-colors ${currentPage === "tasks" ? "text-purple-300" : "text-gray-400"}`}
+              >
                 Задания
               </span>
             </motion.button>
@@ -83,8 +87,12 @@ const Navbar: FC = () => {
               whileTap="tap"
               onClick={() => switchPage("quizzes")}
             >
-              <BookOpenIcon className={`h-5 w-5 transition-colors ${currentPage === "quizzes" ? "text-purple-400" : "text-gray-300"}`} />
-              <span className={`mt-1 text-xs transition-colors ${currentPage === "quizzes" ? "text-purple-300" : "text-gray-400"}`}>
+              <BookOpenIcon
+                className={`h-5 w-5 transition-colors ${currentPage === "quizzes" ? "text-purple-400" : "text-gray-300"}`}
+              />
+              <span
+                className={`mt-1 text-xs transition-colors ${currentPage === "quizzes" ? "text-purple-300" : "text-gray-400"}`}
+              >
                 Квизы
               </span>
             </motion.button>
@@ -104,13 +112,17 @@ const Navbar: FC = () => {
               <HomeIcon className="h-7 w-7 text-white" />
               <span className="sr-only">Главная</span>
             </motion.button>
-            
+
             {/* Пульсирующий эффект за кнопкой, если активна */}
             {currentPage === "home" && (
-              <motion.div 
+              <motion.div
                 animate={{ scale: [1, 1.1, 1], opacity: [0.7, 0.3, 0.7] }}
                 className="absolute inset-0 rounded-full bg-purple-500/30 blur-md"
-                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
               />
             )}
           </li>
@@ -126,8 +138,12 @@ const Navbar: FC = () => {
               whileTap="tap"
               onClick={() => switchPage("broadcast")}
             >
-              <TrophyIcon className={`h-5 w-5 transition-colors ${currentPage === "broadcast" ? "text-purple-400" : "text-gray-300"}`} />
-              <span className={`mt-1 text-xs transition-colors ${currentPage === "broadcast" ? "text-purple-300" : "text-gray-400"}`}>
+              <TrophyIcon
+                className={`h-5 w-5 transition-colors ${currentPage === "broadcast" ? "text-purple-400" : "text-gray-300"}`}
+              />
+              <span
+                className={`mt-1 text-xs transition-colors ${currentPage === "broadcast" ? "text-purple-300" : "text-gray-400"}`}
+              >
                 Эфир
               </span>
             </motion.button>
@@ -144,8 +160,12 @@ const Navbar: FC = () => {
               whileTap="tap"
               onClick={() => switchPage("club")}
             >
-              <UserGroupIcon className={`h-5 w-5 transition-colors ${currentPage === "club" ? "text-purple-400" : "text-gray-300"}`} />
-              <span className={`mt-1 text-xs transition-colors ${currentPage === "club" ? "text-purple-300" : "text-gray-400"}`}>
+              <UserGroupIcon
+                className={`h-5 w-5 transition-colors ${currentPage === "club" ? "text-purple-400" : "text-gray-300"}`}
+              />
+              <span
+                className={`mt-1 text-xs transition-colors ${currentPage === "club" ? "text-purple-300" : "text-gray-400"}`}
+              >
                 Клубы
               </span>
             </motion.button>
