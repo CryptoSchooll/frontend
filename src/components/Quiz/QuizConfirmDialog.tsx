@@ -140,19 +140,16 @@ const QuizConfirmDialog = ({
     }
   }
 
-  // Определяем, можно ли закрыть диалог при клике вне окна
-  const allowClose = quizConfirmContext?.actionType !== "continue"
-
   const buttonText = getButtonText()
 
   return (
     <Dialog
       open={isQuizConfirmOpen}
       onOpenChange={(open) => {
-        // Если диалог закрывается (open = false) и это не окно продолжения, то закрываем
-        // Иначе (для продолжения) игнорируем попытку закрытия при клике вне окна
-        if (!open && allowClose) {
-          closeQuizConfirm()
+        // Если диалог закрывается (open = false), вызываем handleCancel
+        // Это нужно для правильной обработки закрытия при клике вне окна
+        if (!open) {
+          handleCancel()
         }
       }}
     >
