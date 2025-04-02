@@ -3,6 +3,7 @@ import { create } from "zustand"
 import { DIRECTIONS, OPOSITE_DIRECTIONS } from "@/constants"
 
 const MAX_CORRIDORS = 8
+const MAX_COORDINATE = 3
 
 const calculateFilledState = (corridors: Corridor[]): boolean => {
   if (corridors.length >= MAX_CORRIDORS) {
@@ -294,6 +295,31 @@ const generateNewCorridor = (
     }
   }
 
+  let availableDirectionsEnd = DIRECTIONS.filter(
+    (dir) => dir !== OPOSITE_DIRECTIONS[direction],
+  )
+
+  if (newEndX == MAX_COORDINATE) {
+    availableDirectionsEnd = availableDirectionsEnd.filter(
+      (dir) => dir !== "right",
+    )
+  }
+  if (newEndX == -MAX_COORDINATE) {
+    availableDirectionsEnd = availableDirectionsEnd.filter(
+      (dir) => dir !== "left",
+    )
+  }
+  if (newEndY == MAX_COORDINATE) {
+    availableDirectionsEnd = availableDirectionsEnd.filter(
+      (dir) => dir !== "up",
+    )
+  }
+  if (newEndY == -MAX_COORDINATE) {
+    availableDirectionsEnd = availableDirectionsEnd.filter(
+      (dir) => dir !== "down",
+    )
+  }
+
   return {
     id: crypto.randomUUID(),
     startX: newStartX,
@@ -305,8 +331,6 @@ const generateNewCorridor = (
     cost: 1000,
     classes: [],
     availableDirectionsStart: [],
-    availableDirectionsEnd: DIRECTIONS.filter(
-      (dir) => dir !== OPOSITE_DIRECTIONS[direction],
-    ),
+    availableDirectionsEnd: availableDirectionsEnd,
   }
 }
