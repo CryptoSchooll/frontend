@@ -8,13 +8,13 @@ import { useGameStore } from "@/hooks/gameStore"
 
 const Grid = ({ scale }: { scale: number }) => (
   <div
-    className="absolute top-0 grid size-full grid-cols-6 grid-rows-6 bg-cyan-400"
+    className="absolute top-0 grid size-full grid-cols-6 grid-rows-6 border-2 border-neutral-700"
     style={{
       transform: `scale(${scale})`,
     }}
   >
     {Array.from({ length: 36 }).map((_, index) => (
-      <div key={index} className="size-full border border-cyan-500 bg-black" />
+      <div key={index} className="size-full border border-neutral-700" />
     ))}
   </div>
 )
@@ -29,7 +29,7 @@ const Home = () => {
       <CameraPortal>
         <Camera>
           <div
-            className="z-1 relative size-[2400px] bg-cyan-700"
+            className="z-1 relative size-[2400px]"
             style={{
               transform: `scale(${scale})`,
             }}
