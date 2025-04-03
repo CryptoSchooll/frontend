@@ -12,7 +12,8 @@ export type ConfirmDrawerContext = {
 }
 
 export type ClassInfoContext = {
-  classId: string
+  classData: Class
+  corridorId: string
 }
 
 export type QuizContext = {
