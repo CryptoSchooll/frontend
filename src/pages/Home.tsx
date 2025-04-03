@@ -1,11 +1,18 @@
 import { Camera, CameraPortal, Corridor } from "@core"
+
 import { motion } from "framer-motion"
+import { useState } from "react"
 
 import useBalanceStore from "@/hooks/balanceStore"
 import { useGameStore } from "@/hooks/gameStore"
 
-const Grid = () => (
-  <div className="absolute top-0 grid size-full grid-cols-6 grid-rows-6 bg-cyan-400">
+const Grid = ({ scale }: { scale: number }) => (
+  <div
+    className="absolute top-0 grid size-full grid-cols-6 grid-rows-6 bg-cyan-400"
+    style={{
+      transform: `scale(${scale})`,
+    }}
+  >
     {Array.from({ length: 36 }).map((_, index) => (
       <div key={index} className="size-full border border-cyan-500 bg-black" />
     ))}
@@ -13,6 +20,7 @@ const Grid = () => (
 )
 
 const Home = () => {
+  const [scale, setScale] = useState(1)
   const { corridors, filled } = useGameStore()
   const { electricityOn, electricityCost, actions } = useBalanceStore()
 
@@ -20,12 +28,17 @@ const Home = () => {
     <div className="relative h-screen bg-black">
       <CameraPortal>
         <Camera>
-          <div className="relative size-[2400px] bg-cyan-700">
+          <div
+            className="z-1 relative size-[2400px] bg-cyan-700"
+            style={{
+              transform: `scale(${scale})`,
+            }}
+          >
             {corridors.map((corridor, i) => (
               <Corridor key={i} corridorData={corridor} isFilled={filled} />
             ))}
           </div>
-          <Grid />
+          <Grid scale={scale} />
         </Camera>
       </CameraPortal>
       {!electricityOn && (
@@ -99,6 +112,21 @@ const Home = () => {
           </motion.div>
         </>
       )}
+
+      <div className="z-1 fixed bottom-24 right-5 flex flex-col gap-3">
+        <button
+          className="bg-black p-3 text-white"
+          onClick={() => setScale(scale + 0.2 <= 1.5 ? scale + 0.2 : 1.5)}
+        >
+          +
+        </button>
+        <button
+          className="bg-black p-3 text-white"
+          onClick={() => setScale(scale - 0.2 >= 0.5 ? scale - 0.2 : 0.5)}
+        >
+          -
+        </button>
+      </div>
     </div>
   )
 }
