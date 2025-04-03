@@ -38,22 +38,48 @@ const CorridorConfirmDrawer = ({
       open={isConfirmDrawerOpen}
       onOpenChange={(open) => !open && closeConfirmDrawer()}
     >
-      <DrawerContent className="pb-5 text-white">
+      <DrawerContent>
         {confirmDrawerContext && (
           <>
-            <DrawerHeader className="mt-4 p-0 text-white">
-              <DrawerTitle>Подтверждение</DrawerTitle>
+            <DrawerHeader>
+              <DrawerTitle>Создание коридора</DrawerTitle>
               <DrawerDescription>
-                Добавить новый корридор &quot;{confirmDrawerContext.direction}
-                &quot;?
+                Вы хотите добавить новый коридор в направлении &quot;
+                {confirmDrawerContext.direction}&quot;?
               </DrawerDescription>
             </DrawerHeader>
+
+            <div className="px-6">
+              <div className="rounded-lg border border-purple-800/20 bg-purple-900/20 p-4">
+                <div className="mb-3 flex items-center space-x-3">
+                  <div className="h-10 w-10 rounded-lg bg-purple-700/60"></div>
+                  <div>
+                    <h4 className="font-medium text-white">
+                      Информация о коридоре
+                    </h4>
+                    <p className="text-sm text-gray-400">
+                      Направление: {confirmDrawerContext.direction}
+                    </p>
+                  </div>
+                </div>
+                <p className="text-sm text-gray-400">
+                  Новый коридор будет добавлен к текущей структуре. Вы сможете
+                  размещать в нем дополнительные классы.
+                </p>
+              </div>
+            </div>
+
             <DrawerFooter>
-              <button onClick={handleConfirmCorridor}>
-                Да, Установить ({confirmDrawerContext.direction})
+              <button
+                className="w-full rounded-md bg-gradient-to-r from-green-800 to-teal-800 py-2.5 text-sm font-medium text-white shadow-md transition-all hover:from-green-700 hover:to-teal-700 active:translate-y-0.5"
+                onClick={handleConfirmCorridor}
+              >
+                Подтвердить создание
               </button>
               <DrawerClose asChild>
-                <button>Отмена</button>
+                <button className="rounded-md border border-gray-700 bg-gray-800 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700">
+                  Отмена
+                </button>
               </DrawerClose>
             </DrawerFooter>
           </>

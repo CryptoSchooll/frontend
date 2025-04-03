@@ -1,6 +1,8 @@
 import ClassInfoDialog from "./core/ClassInfoDialog"
 import ClassShopDrawer from "./core/ClassShopDrawer"
 import CorridorConfirmDrawer from "./core/CorridorConfirmDrawer"
+import QuizBoxDialog from "./Quiz/QuizBoxDialog"
+import QuizConfirmDialog from "./Quiz/QuizConfirmDialog"
 
 import { useUIStore } from "@/hooks/uiStore"
 
@@ -12,10 +14,18 @@ export function GlobalUI() {
     confirmDrawerContext,
     isClassInfoOpen,
     classInfoContext,
+    isQuizActive,
+    quizContext,
+    isQuizConfirmOpen,
+    quizConfirmContext,
   } = useUIStore()
-  const { closeShopDrawer, closeConfirmDrawer, closeClassInfo } = useUIStore(
-    (state) => state.actions,
-  )
+  const {
+    closeShopDrawer,
+    closeConfirmDrawer,
+    closeClassInfo,
+    closeQuiz,
+    closeQuizConfirm,
+  } = useUIStore((state) => state.actions)
   return (
     <>
       <ClassShopDrawer
@@ -34,6 +44,19 @@ export function GlobalUI() {
         classInfoContext={classInfoContext}
         closeClassInfo={closeClassInfo}
         isClassInfoOpen={isClassInfoOpen}
+      />
+
+      {/* Компоненты викторин */}
+      <QuizConfirmDialog
+        closeQuizConfirm={closeQuizConfirm}
+        isQuizConfirmOpen={isQuizConfirmOpen}
+        quizConfirmContext={quizConfirmContext}
+      />
+
+      <QuizBoxDialog
+        closeQuiz={closeQuiz}
+        isQuizActive={isQuizActive}
+        quizContext={quizContext}
       />
     </>
   )

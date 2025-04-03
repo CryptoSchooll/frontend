@@ -1,5 +1,7 @@
 import type { FC } from "react"
 
+import { CheckCircle, Crown, Lock, TrendingUp } from "lucide-react"
+
 interface QuizItemProps {
   id: string
   title: string
@@ -11,38 +13,101 @@ interface QuizItemProps {
 
 const QuizItem: FC<QuizItemProps> = ({
   id,
+  title,
   tasksCount,
   isAvailable,
   solved,
   correctAnswers,
 }) => {
-  // Подготавливаем текст статуса (справа)
-  let statusText = "→"
-  if (solved) {
-    statusText = `completed ${correctAnswers}/${tasksCount}`
-  } else if (!isAvailable) {
-    statusText = "locked"
+  // Визуальные флаги
+  const isLocked = !isAvailable
+  const isCompleted = solved
+
+  // Определяем стили контейнера в зависимости от состояния
+  const getContainerStyles = () => {
+    if (isCompleted) {
+      return "border-green-500/30 bg-gradient-to-br from-black/30 to-green-900/20"
+    }
+    if (isLocked) {
+      return "border-gray-600/30 bg-gradient-to-br from-black/40 to-gray-800/10"
+    }
+    return "border-purple-500/30 bg-gradient-to-br from-black/20 to-purple-900/20 hover:border-purple-400/50 hover:from-black/30 hover:to-purple-800/30 active:scale-[0.98]"
+  }
+
+  // Определяем иконку статуса
+  const StatusIcon = () => {
+    if (isCompleted) {
+      return <CheckCircle className="h-5 w-5 text-green-500" />
+    }
+    if (isLocked) {
+      return <Lock className="h-5 w-5 text-yellow-500" />
+    }
+    return <Crown className="h-5 w-5 text-purple-400" />
+  }
+
+  // Отображаем полосу прогресса для завершенных викторин
+  const ProgressBar = () => {
+    if (!isCompleted) return null
+
+    const percent = (correctAnswers / tasksCount) * 100
+
+    return (
+      <div className="mt-2 h-1 w-full overflow-hidden rounded-full bg-black/30">
+        <div
+          className="h-full rounded-full bg-green-500"
+          style={{ width: `${percent}%` }}
+        />
+      </div>
+    )
   }
 
   return (
-    <div className="relative h-14 w-96" data-id={id}>
-      {/* Фон серого цвета на всю ширину/высоту */}
-      <div className="absolute inset-0 bg-zinc-300" />
+    <div
+      className={`
+      mb-2 rounded-lg border p-3 shadow-lg backdrop-blur-sm
+      ${getContainerStyles()}
+      transition-all duration-200
+    `}
+    >
+      <div className="flex items-center justify-between">
+        {/* Левая часть - иконка и название */}
+        <div className="flex min-w-0 items-center space-x-3">
+          <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-black/40 backdrop-blur-sm">
+            <StatusIcon />
+          </div>
+          <div className="min-w-0">
+            <div className="truncate text-sm font-semibold text-white">
+              {title || `Викторина ${id}`}
+            </div>
+            <div className="text-xs text-purple-300">
+              {isCompleted ? (
+                <span>
+                  Ответов: {correctAnswers}/{tasksCount}
+                </span>
+              ) : isLocked ? (
+                <span>Заблокировано</span>
+              ) : (
+                <span>Вопросов: {tasksCount}</span>
+              )}
+            </div>
+          </div>
+        </div>
 
-      {/* Крупная цифра (id) слева, по центру вертикали */}
-      <div className="absolute left-3 top-1/2 -translate-y-1/2 font-['Intro_Book'] text-5xl leading-none text-black">
-        {id}
+        {/* Правая часть - статус или стрелка */}
+        <div className="ml-2 flex-shrink-0">
+          {!isLocked && !isCompleted && (
+            <TrendingUp className="h-5 w-5 text-purple-400" />
+          )}
+          {isCompleted && (
+            <div className="text-2xs rounded-full bg-green-900/20 px-2 py-0.5 font-medium text-green-400">
+              Пройдено
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* Надпись QUIZ #... немного правее цифры, по центру вертикали */}
-      <div className="absolute left-14 top-1/2 -translate-y-1/2 font-['Intro_Book'] text-xl font-normal leading-snug text-black">
-        {`QUIZ #${id}`}
-      </div>
-
-      {/* Статус (completed, locked, →) прижат к правому краю, по центру вертикали */}
-      <div className="absolute right-4 top-1/2 -translate-y-1/2 text-right font-['Intro_Book'] text-base font-normal leading-snug text-black">
-        {statusText}
-      </div>
+      {/* Полоса прогресса */}
+      <ProgressBar />
     </div>
   )
 }
