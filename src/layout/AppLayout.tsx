@@ -1,6 +1,12 @@
+import { initData } from "@telegram-apps/sdk-react"
+import { useEffect, useState } from "react"
+
+import { useMutation, useQuery } from "@tanstack/react-query"
+
 import { Navbar, UserHeader } from "@/components"
 import { GlobalUI } from "@/components/GlobalUI"
 import usePage from "@/hooks/usePage"
+import { useTranslationStore } from "@/hooks/useTranslationStore"
 import {
   Broadcast,
   Club,
@@ -10,9 +16,43 @@ import {
   Quizzes,
   Tasks,
 } from "@/pages"
+import { claim, login } from "@/lib/query"
+import { useUserStore } from "@/hooks/userStore"
 
 const AppLayout: React.FC = () => {
   const { currentPage } = usePage()
+  const { translations } = useTranslationStore()
+  const setUser = useUserStore((state) => state.setUser)
+
+  const authMutation = useMutation({
+    mutationFn: login,
+  })
+
+  const claimsMutation = useMutation({
+    mutationFn: claim,
+    onSuccess: (data) => {
+      console.log(data)
+    },
+    onError: (err) => {
+      console.log(err)
+    },
+  })
+
+  useEffect(() => {
+    const data =
+      "user=%7B%22id%22%3A1229587009%2C%22first_name%22%3A%22%D0%B2%D0%BB%D0%B0%D0%B4%D0%BA%22%2C%22last_name%22%3A%22%22%2C%22username%22%3A%22vshakitskiy%22%2C%22language_code%22%3A%22en%22%2C%22allows_write_to_pm%22%3Atrue%2C%22photo_url%22%3A%22https%3A%5C%2F%5C%2Ft.me%5C%2Fi%5C%2Fuserpic%5C%2F320%5C%2FVeOA9IfDQFf05Q-qkFLlZYnegZn_78alSWgArBIeKQ8.svg%22%7D&chat_instance=8718946310627105826&chat_type=private&auth_date=1743849707&signature=4wiyTHCu3rhcucuhcsYYJgDYCy1ufJgfX6v1-IOHUX3kurqLoTONICYf-BTDNGZqO_3HqQwJBqC7covXzLHrBw&hash=d76545ece7bc19cded210f5b79cc469e94950cf23a07843339a82b3988bd8539"
+
+    const getData = async () => {
+      const res = await authMutation.mutateAsync(data)
+      const claims = await claimsMutation.mutateAsync(res.data.token)
+
+      if (claims.data) {
+        setUser(res.data)
+      }
+    }
+
+    getData()
+  }, [])
 
   // Специальный layout для сцены игры (Home)
   if (currentPage === "home") {
@@ -20,7 +60,6 @@ const AppLayout: React.FC = () => {
       <div className="relative h-screen w-screen overflow-hidden bg-black text-white">
         {/* Сцена */}
         <Home />
-
         {/* Интерфейс (HUD) поверх сцены */}
         <div className="pointer-events-none absolute inset-0 z-10">
           {/* Хедер поверх */}
@@ -34,7 +73,7 @@ const AppLayout: React.FC = () => {
               className="rounded-full bg-purple-600 px-6 py-2 font-semibold text-white shadow-lg transition-transform hover:scale-105 hover:bg-purple-500 active:scale-95"
               onClick={() => usePage.getState().switchPage("leaderboard")}
             >
-              Таблица лидеров
+              {translations.leaderboardButton}
             </button>
           </div>
 
@@ -49,7 +88,6 @@ const AppLayout: React.FC = () => {
     )
   }
 
-  // Общий layout для всех остальных страниц
   let pageContent
   switch (currentPage) {
     case "quizzes":

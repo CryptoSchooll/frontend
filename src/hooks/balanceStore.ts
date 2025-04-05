@@ -12,10 +12,14 @@ type balanceStore = {
   actions: {
     updateBalance: () => void
     addIncome: (rate: number) => void
+    setBalance: (amount: number) => void
+    setIncome: (amount: number) => void
     substractIncome: (rate: number) => void
     addBalance: (amount: number) => void
     substractBalance: (amount: number) => void
     canAfford: (cost: number) => boolean
+    setElectricityDate: (date: Date) => void
+    setElectricityCost: (cost: number) => void
     payForElectricity: () => boolean
     checkForElectricity: () => void
     activateMultiplier: (multiplier: number, durationHours: number) => void
@@ -48,10 +52,20 @@ const useBalanceStore = create<balanceStore>((set, get) => ({
       const effectiveIncome = income * currentMultiplier
 
       if (electricityOn) {
-        set((state) => ({
-          balance: Math.floor(state.balance + effectiveIncome),
-        }))
+        set((state) => {
+          return {
+            balance: Math.floor(state.balance + effectiveIncome),
+          }
+        })
       }
+    },
+    setBalance: (amount) => {
+      if (amount < 0) return
+      set({ balance: amount })
+    },
+    setIncome: (amount) => {
+      if (amount < 0) return
+      set({ income: amount })
     },
     addIncome: (rate) => {
       if (rate <= 0) return
@@ -74,6 +88,12 @@ const useBalanceStore = create<balanceStore>((set, get) => ({
       set((state) => ({ balance: Math.max(0, state.balance - amount) }))
     },
     canAfford: (cost) => get().balance >= cost,
+    setElectricityDate: (date) => {
+      set({ electricityPaidUntil: date })
+    },
+    setElectricityCost: (cost) => {
+      set({ electricityCost: cost })
+    },
     payForElectricity: () => {
       const { balance, electricityCost } = get()
       if (balance < electricityCost) return false
@@ -128,16 +148,16 @@ const useBalanceStore = create<balanceStore>((set, get) => ({
   },
 }))
 
-setInterval(() => {
-  useBalanceStore.getState().actions.updateBalance()
-}, 1000)
+// setInterval(() => {
+//   useBalanceStore.getState().actions.updateBalance()
+// }, 1000)
 
-setInterval(() => {
-  useBalanceStore.getState().actions.checkForElectricity()
-}, 1000)
+// setInterval(() => {
+//   useBalanceStore.getState().actions.checkForElectricity()
+// }, 1000)
 
-setInterval(() => {
-  useBalanceStore.getState().actions.checkForMultiplier()
-}, 1000)
+// setInterval(() => {
+//   useBalanceStore.getState().actions.checkForMultiplier()
+// }, 1000)
 
 export default useBalanceStore
