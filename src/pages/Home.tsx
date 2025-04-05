@@ -1,11 +1,13 @@
 import { Camera, CameraPortal, Corridor } from "@core"
-
 import { motion } from "framer-motion"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 import useBalanceStore from "@/hooks/balanceStore"
 import { useGameStore } from "@/hooks/gameStore"
 import { useTranslationStore } from "@/hooks/useTranslationStore"
+import { useUserStore } from "@/hooks/userStore"
+import { useMutation, useQuery } from "@tanstack/react-query"
+import { getElectricity, payElectricity } from "@/lib/query"
 
 const Grid = ({ scale }: { scale: number }) => (
   <div
@@ -25,7 +27,24 @@ const Home = () => {
   const { corridors, filled } = useGameStore()
   const { electricityOn, electricityCost, actions } = useBalanceStore()
   const { translations } = useTranslationStore()
-  console.log(translations.a)
+  const { user } = useUserStore()
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["electricity"],
+    queryFn: () => getElectricity(user?.token!),
+    enabled: !!user?.token,
+  })
+
+  const payElectricityMutation = useMutation({
+    mutationFn: payElectricity
+  })
+
+  useEffect(() => {
+    if (!data) return
+
+    actions.setElectricityDate(new Date(data.data.nextPaymentDue))
+    actions.setElectricityCost(data.data.estimatedCost)
+  }, [data])
 
   return (
     <div className="relative h-screen bg-black">
@@ -45,7 +64,8 @@ const Home = () => {
           <Grid scale={scale} />
         </Camera>
       </CameraPortal>
-      {!electricityOn && (
+
+      {!electricityOn && !isLoading && (
         <>
           <div className="z-1 fixed h-screen w-screen bg-black/80" />
           <motion.div
@@ -81,18 +101,16 @@ const Home = () => {
                   </svg>
                 </div>
                 <h1 className="text-xl font-bold text-red-300">
-                  Электропитание отключено!
+                  {translations.electricityHeading}
                 </h1>
               </div>
 
               <div className="mb-6 space-y-3">
                 <p className="text-gray-300">
-                  Школа не работает из-за отсутствия электричества. Без
-                  электропитания невозможно продолжить обучение.
+                  {translations.electricityDescription}
                 </p>
                 <p className="text-sm text-gray-400">
-                  Необходимо оплатить счет за электроэнергию, чтобы восстановить
-                  работу.
+                  {translations.electricitySolution}
                 </p>
               </div>
 
@@ -103,10 +121,14 @@ const Home = () => {
                   scale: 1.02,
                 }}
                 whileTap={{ scale: 0.98 }}
-                onClick={() => actions.payForElectricity()}
-              >
+                onClick={() => {
+                  payElectricityMutation.mutate(user?.token!)
+                  actions.payForElectricity()
+                }
+                }
+                  >
                 <span className="text-sm font-medium">
-                  Оплатить электричество
+                  {translations.elecricityAction}
                 </span>
                 <span className="rounded-md bg-white/10 px-2 py-0.5 text-sm backdrop-blur-sm">
                   {electricityCost} EDt

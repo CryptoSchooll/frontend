@@ -11,6 +11,7 @@ import { motion } from "framer-motion"
 import { useEffect, useState } from "react"
 
 import usePage from "@/hooks/usePage"
+import { useTranslationStore } from "@/hooks/useTranslationStore"
 
 // Вариант анимации для иконок
 const iconVariants = {
@@ -46,6 +47,7 @@ const homeVariants = {
 
 const Navbar: FC = () => {
   const { currentPage, switchPage } = usePage()
+  const { translations } = useTranslationStore()
 
   return (
     <nav className="fixed bottom-4 left-1/2 z-50 w-full max-w-lg -translate-x-1/2 transform rounded-full shadow-xl">
@@ -71,7 +73,7 @@ const Navbar: FC = () => {
               <span
                 className={`mt-1 text-xs transition-colors ${currentPage === "tasks" ? "text-purple-300" : "text-gray-400"}`}
               >
-                Задания
+                {translations.navbarTasks}
               </span>
             </motion.button>
           </li>
@@ -93,7 +95,7 @@ const Navbar: FC = () => {
               <span
                 className={`mt-1 text-xs transition-colors ${currentPage === "quizzes" ? "text-purple-300" : "text-gray-400"}`}
               >
-                Квизы
+                {translations.navbarQuizzes}
               </span>
             </motion.button>
           </li>
@@ -110,7 +112,7 @@ const Navbar: FC = () => {
               onClick={() => switchPage("home")}
             >
               <HomeIcon className="h-7 w-7 text-white" />
-              <span className="sr-only">Главная</span>
+              <span className="sr-only">Home</span>
             </motion.button>
 
             {/* Пульсирующий эффект за кнопкой, если активна */}
@@ -144,7 +146,7 @@ const Navbar: FC = () => {
               <span
                 className={`mt-1 text-xs transition-colors ${currentPage === "broadcast" ? "text-purple-300" : "text-gray-400"}`}
               >
-                Эфир
+                {translations.navbarBroadcast}
               </span>
             </motion.button>
           </li>
@@ -166,7 +168,7 @@ const Navbar: FC = () => {
               <span
                 className={`mt-1 text-xs transition-colors ${currentPage === "club" ? "text-purple-300" : "text-gray-400"}`}
               >
-                Клубы
+                {translations.navbarClubs}
               </span>
             </motion.button>
           </li>

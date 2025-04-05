@@ -1,4 +1,5 @@
 import js from "@eslint/js"
+import pluginQuery from "@tanstack/eslint-plugin-query"
 import ts from "@typescript-eslint/eslint-plugin"
 import pluginImport from "eslint-plugin-import"
 import prettier from "eslint-plugin-prettier"
@@ -97,6 +98,7 @@ export default tseslint.config(
         },
       ],
     },
+    ...pluginQuery.configs["flat/recommended"],
     settings: {
       react: {
         version: "detect",
