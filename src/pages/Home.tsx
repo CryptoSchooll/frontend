@@ -5,6 +5,7 @@ import { useState } from "react"
 
 import useBalanceStore from "@/hooks/balanceStore"
 import { useGameStore } from "@/hooks/gameStore"
+import { useTranslationStore } from "@/hooks/useTranslationStore"
 
 const Grid = ({ scale }: { scale: number }) => (
   <div
@@ -23,6 +24,8 @@ const Home = () => {
   const [scale, setScale] = useState(1)
   const { corridors, filled } = useGameStore()
   const { electricityOn, electricityCost, actions } = useBalanceStore()
+  const { translations } = useTranslationStore()
+  console.log(translations.a)
 
   return (
     <div className="relative h-screen bg-black">
