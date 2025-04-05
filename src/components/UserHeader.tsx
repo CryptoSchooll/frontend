@@ -6,11 +6,13 @@ import { useEffect, useState } from "react"
 
 import useBalanceStore from "@/hooks/balanceStore"
 import usePage from "@/hooks/usePage"
+import { useTranslationStore } from "@/hooks/useTranslationStore"
 
 const UserHeader: FC = () => {
   const { balance, income } = useBalanceStore()
   const { switchPage } = usePage()
   const [animateBalance, setAnimateBalance] = useState(false)
+  const { switchLanguage } = useTranslationStore()
 
   // Анимация при изменении баланса
   useEffect(() => {
@@ -74,6 +76,8 @@ const UserHeader: FC = () => {
         <div className="flex h-10 items-center justify-center rounded-lg bg-gradient-to-br from-purple-800 to-indigo-900 px-3 font-medium text-white shadow-lg ring-1 ring-white/10">
           <span className="text-sm">×{(1.3).toFixed(1)}</span>
         </div>
+
+        <div className="" onClick={() => switchLanguage()}>SW</div>
       </div>
     </div>
   )
