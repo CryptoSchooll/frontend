@@ -1,13 +1,13 @@
 import { Camera, CameraPortal, Corridor } from "@core"
+import { useMutation } from "@tanstack/react-query"
 import { motion } from "framer-motion"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 
 import useBalanceStore from "@/hooks/balanceStore"
 import { useGameStore } from "@/hooks/gameStore"
-import { useTranslationStore } from "@/hooks/useTranslationStore"
 import { useUserStore } from "@/hooks/userStore"
-import { useMutation, useQuery } from "@tanstack/react-query"
-import { getElectricity, payElectricity } from "@/lib/query"
+import { useTranslationStore } from "@/hooks/useTranslationStore"
+import { payElectricity } from "@/lib/query"
 
 const Grid = ({ scale }: { scale: number }) => (
   <div
@@ -25,26 +25,13 @@ const Grid = ({ scale }: { scale: number }) => (
 const Home = () => {
   const [scale, setScale] = useState(1)
   const { corridors, filled } = useGameStore()
-  const { electricityOn, electricityCost, actions } = useBalanceStore()
+  const { electricityOn, electricityCost } = useBalanceStore()
   const { translations } = useTranslationStore()
   const { user } = useUserStore()
 
-  const { data, isLoading } = useQuery({
-    queryKey: ["electricity"],
-    queryFn: () => getElectricity(user?.token!),
-    enabled: !!user?.token,
-  })
-
   const payElectricityMutation = useMutation({
-    mutationFn: payElectricity
+    mutationFn: payElectricity,
   })
-
-  useEffect(() => {
-    if (!data) return
-
-    actions.setElectricityDate(new Date(data.data.nextPaymentDue))
-    actions.setElectricityCost(data.data.estimatedCost)
-  }, [data])
 
   return (
     <div className="relative h-screen bg-black">
@@ -64,7 +51,7 @@ const Home = () => {
         </Camera>
       </CameraPortal>
 
-      {!electricityOn && !isLoading && (
+      {!electricityOn && (
         <>
           <div className="z-1 fixed h-screen w-screen bg-black/80" />
           <motion.div
@@ -120,12 +107,11 @@ const Home = () => {
                   scale: 1.02,
                 }}
                 whileTap={{ scale: 0.98 }}
-                onClick={() => {
-                  payElectricityMutation.mutate(user?.token!)
-                  actions.payForElectricity()
-                }
-                }
-                  >
+                // onClick={() => {
+                //   payElectricityMutation.mutate(user?.token!)
+                //   actions.payForElectricity()
+                // }}
+              >
                 <span className="text-sm font-medium">
                   {translations.elecricityAction}
                 </span>

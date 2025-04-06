@@ -7,31 +7,14 @@ import { useEffect, useState } from "react"
 import useBalanceStore from "@/hooks/balanceStore"
 import usePage from "@/hooks/usePage"
 import { useTranslationStore } from "@/hooks/useTranslationStore"
-import { useQuery } from "@tanstack/react-query"
-import { useUserStore } from "@/hooks/userStore"
-import { getIncome } from "@/lib/query"
 
 const UserHeader: FC = () => {
   const { balance, income, incomeMultiplier } = useBalanceStore()
-  const { updateBalance, checkForMultiplier, checkForElectricity, setBalance, setIncome } =
+  const { updateBalance, checkForMultiplier, checkForElectricity } =
     useBalanceStore((state) => state.actions)
   const { switchPage } = usePage()
   const [animateBalance, setAnimateBalance] = useState(false)
   const { language, switchLanguage } = useTranslationStore()
-  const { user } = useUserStore()
-
-  const { data, isLoading } = useQuery({
-    queryKey: ["balance", user?.token],
-    queryFn: () => getIncome(user?.token!),
-    enabled: !!user?.token,
-  })
-
-  useEffect(() => {
-    if (!data) return
-
-    setBalance(Number(data.data.balance))
-    setIncome(data.data.totalPassiveIncomePerSecond)
-  }, [data])
 
   useEffect(() => {
     const onTick = () => {
@@ -94,14 +77,12 @@ const UserHeader: FC = () => {
                 className="text-xl font-bold tracking-tight text-white drop-shadow-sm"
                 transition={{ type: "spring", stiffness: 500, damping: 15 }}
               >
-                {!isLoading && balance.toLocaleString()}
+                {balance.toLocaleString()}
               </motion.span>
             </div>
             <div className="mt-0.5 text-xs font-medium text-purple-300/90">
-              {!isLoading && <>
-                <span className="text-green-400">+{income}</span>
-                <span className="ml-1 text-purple-300/80">/сек</span>
-              </>}
+              <span className="text-green-400">+{income}</span>
+              <span className="ml-1 text-purple-300/80">/сек</span>
             </div>
           </div>
         </motion.div>

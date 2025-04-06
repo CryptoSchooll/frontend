@@ -1,27 +1,42 @@
 import axios from "axios"
 
-export const login = async (rawInitData: string) => {
-  const endpoint = "api/v1/auth/token"
+const API_URL = "http://localhost:3000/api/v1"
 
-  const res = await axios.post<LoginResponse>(`http://localhost:3000/${endpoint}`, {
-    initData: rawInitData,
-  }, {
-    headers: {
-      "Content-Type": "application/json",
-      "X-Telegram-Init-Data": rawInitData,
+const ENDPOINTS = {
+  login: "auth/token",
+  claim: "incomes/claim",
+  getIncome: "incomes",
+  getElectricity: "electricity/status",
+  payElectricity: "electricity/pay",
+} as const
+
+const client = axios.create({
+  baseURL: API_URL,
+  headers: {
+    "Content-Type": "application/json",
+  },
+})
+
+export const login = async (rawInitData: string) => {
+  const res = await client.post<LoginResponse>(
+    ENDPOINTS.login,
+    {
+      initData: rawInitData,
     },
-  })
+    {
+      headers: {
+        "X-Telegram-Init-Data": rawInitData,
+      },
+    },
+  )
 
   return res.data
 }
 
 export const claim = async (token: string) => {
-  const endpoint = "api/v1/incomes/claim"
-
-  const res = await axios.post<ClaimResponse>(`http://localhost:3000/${endpoint}`, null, {
+  const res = await client.post<ClaimResponse>(ENDPOINTS.claim, null, {
     headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}`,
+      Authorization: `Bearer ${token}`,
     },
   })
 
@@ -29,12 +44,9 @@ export const claim = async (token: string) => {
 }
 
 export const getIncome = async (token: string) => {
-  const endpoint = "api/v1/incomes"
-
-  const res = await axios.get(`http://localhost:3000/${endpoint}`, {
+  const res = await client.get(ENDPOINTS.getIncome, {
     headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}`,
+      Authorization: `Bearer ${token}`,
     },
   })
 
@@ -42,11 +54,9 @@ export const getIncome = async (token: string) => {
 }
 
 export const getElectricity = async (token: string) => {
-  const endpoint = "api/v1/electricity/status"
-  const res = await axios.get(`http://localhost:3000/${endpoint}`, {
+  const res = await client.get(ENDPOINTS.getElectricity, {
     headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}`,
+      Authorization: `Bearer ${token}`,
     },
   })
 
@@ -54,13 +64,10 @@ export const getElectricity = async (token: string) => {
 }
 
 export const payElectricity = async (token: string) => {
-  const endpoint = "api/v1/electricity/pay"
-
-  const res = await axios.post(`http://localhost:/${endpoint}`, null, {
+  const res = await client.post(ENDPOINTS.payElectricity, null, {
     headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}`,
-    }
+      Authorization: `Bearer ${token}`,
+    },
   })
 
   return res.data
