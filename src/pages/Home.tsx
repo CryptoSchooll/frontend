@@ -1,5 +1,4 @@
-import { Camera, CameraPortal, Corridor } from "@core"
-
+import { AxonometricView, Camera, CameraPortal, Corridor } from "@core"
 import { motion } from "framer-motion"
 import { useState } from "react"
 
@@ -28,17 +27,14 @@ const Home = () => {
     <div className="relative h-screen bg-black">
       <CameraPortal>
         <Camera>
-          <div
-            className="z-1 relative size-[2400px]"
-            style={{
-              transform: `scale(${scale})`,
-            }}
-          >
-            {corridors.map((corridor, i) => (
-              <Corridor key={i} corridorData={corridor} isFilled={filled} />
-            ))}
-          </div>
-          <Grid scale={scale} />
+          <AxonometricView scale={scale}>
+            <div className="z-1 relative size-[2400px]">
+              {corridors.map((corridor, i) => (
+                <Corridor key={i} corridorData={corridor} isFilled={filled} />
+              ))}
+            </div>
+            <Grid scale={1} />
+          </AxonometricView>
         </Camera>
       </CameraPortal>
       {!electricityOn && (
@@ -115,13 +111,13 @@ const Home = () => {
 
       <div className="z-1 fixed bottom-24 right-5 flex flex-col gap-3">
         <button
-          className="bg-black p-3 text-white"
+          className="rounded-full bg-purple-600 p-3 text-white shadow-lg hover:bg-purple-500 active:bg-purple-700"
           onClick={() => setScale(scale + 0.2 <= 1.5 ? scale + 0.2 : 1.5)}
         >
           +
         </button>
         <button
-          className="bg-black p-3 text-white"
+          className="rounded-full bg-purple-600 p-3 text-white shadow-lg hover:bg-purple-500 active:bg-purple-700"
           onClick={() => setScale(scale - 0.2 >= 0.5 ? scale - 0.2 : 0.5)}
         >
           -

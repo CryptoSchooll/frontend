@@ -32,7 +32,7 @@ const ExpansionButtons = ({
             side={side}
           >
             <div
-              className="absolute size-8 rounded bg-green-500 text-white"
+              className="absolute size-8 rounded bg-green-500 text-white shadow-md hover:bg-green-400 active:bg-green-600"
               style={{
                 ...BUTTONS_POSITIONS[direction],
               }}
@@ -61,11 +61,12 @@ const CorridorMemo = ({
 
   return (
     <div
-      className="z-1 absolute h-[40px] w-[400px] bg-amber-400"
+      className="z-1 absolute h-[40px] w-[400px] bg-amber-400/90 shadow-lg"
       style={{
         top: `${(3 + -corridorData.startY) * 400 - 20 + posMeta.top}px`,
         left: `${(3 + corridorData.startX) * 400 + posMeta.left}px`,
         transform: `rotate(${posMeta.rotate})`,
+        borderRadius: "2px",
       }}
     >
       {isFilled && (
