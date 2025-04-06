@@ -9,17 +9,17 @@ interface AxonometricViewProps {
   children: ReactNode
 }
 
-const AxonometricView: FC<AxonometricViewProps> = ({ 
-  children,
-  scale = 1
+const AxonometricView: FC<AxonometricViewProps> = ({
+  children, scale = 1,
 }) => {
   return (
     <div
       className="relative origin-center"
       style={{
-        transform: `scale(${scale}) rotateX(50deg) rotateZ(-45deg)`,
+        // Стандартные углы для изометрической проекции
+        transform: `scale(${scale}) rotateX(30deg) rotateZ(-45deg)`,
         transformStyle: "preserve-3d",
-        perspective: "1200px",
+        perspective: "1200px", // Оставляем перспективу для 3D-эффекта
       }}
     >
       {children}
