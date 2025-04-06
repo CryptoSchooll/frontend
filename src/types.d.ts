@@ -14,12 +14,12 @@ type Class = {
 
 type ClassLike =
   | ({
-    isClass: true
-  } & Class)
+      isClass: true
+    } & Class)
   | {
-    position: Position
-    isClass: false
-  }
+      position: Position
+      isClass: false
+    }
 
 type Direction = "up" | "down" | "left" | "right"
 
@@ -51,7 +51,7 @@ type LoginResponse = {
         language_code: string
         allows_write_to_pm: boolean
         photo_url: string
-      },
+      }
       startParam: any
       queryId: any
       authDate: string

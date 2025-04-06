@@ -5,9 +5,11 @@ const API_URL = "http://localhost:3000/api/v1"
 const ENDPOINTS = {
   login: "auth/token",
   claim: "incomes/claim",
-  getIncome: "incomes",
+  getIncome: "incomes/status",
+  getMultiplier: "incomes/multipliers",
   getElectricity: "electricity/status",
   payElectricity: "electricity/pay",
+  getCorridors: "corridors",
 } as const
 
 const client = axios.create({
@@ -70,5 +72,24 @@ export const payElectricity = async (token: string) => {
     },
   })
 
+  return res.data
+}
+
+export const getCorridors = async (token: string) => {
+  const res = await client.get(ENDPOINTS.getCorridors, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  })
+
+  return res.data
+}
+
+export const getMultiplier = async (token: string) => {
+  const res = await client.get(ENDPOINTS.getMultiplier, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  })
   return res.data
 }

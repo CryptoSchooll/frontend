@@ -25,7 +25,7 @@ const Grid = ({ scale }: { scale: number }) => (
 const Home = () => {
   const [scale, setScale] = useState(1)
   const { corridors, filled } = useGameStore()
-  const { electricityOn, electricityCost } = useBalanceStore()
+  const { electricityOn, electricityCost, actions } = useBalanceStore()
   const { translations } = useTranslationStore()
   const { user } = useUserStore()
 
@@ -108,10 +108,10 @@ const Home = () => {
                   scale: 1.02,
                 }}
                 whileTap={{ scale: 0.98 }}
-                // onClick={() => {
-                //   payElectricityMutation.mutate(user?.token!)
-                //   actions.payForElectricity()
-                // }}
+                onClick={() => {
+                  payElectricityMutation.mutate(user!.token)
+                  actions.payForElectricity()
+                }}
               >
                 <span className="text-sm font-medium">
                   {translations.elecricityAction}
