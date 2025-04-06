@@ -7,8 +7,8 @@ import type { FC } from "react"
 interface NormalizedImageProps {
   alt: string
   className?: string
-  rotate?: number // Только 2D поворот
-  scale?: number // Только 2D масштаб
+  rotate?: number // 2D поворот после нормализации
+  scale?: number // 2D масштаб после нормализации
   src: string
   // Добавляем style для прямого управления позицией и размером
   style?: React.CSSProperties
@@ -18,27 +18,38 @@ const NormalizedImage: FC<NormalizedImageProps> = ({
   alt,
   className = "",
   rotate = 0,
-  scale = 1,
+  scale = 1, // Масштаб по умолчанию 1
   src,
   style, // Принимаем style извне
 }) => {
-  // Только 2D трансформации
-  const transform = `scale(${scale}) ${rotate ? `rotate(${rotate}deg)` : ""}`.trim()
+  // Трансформация в AxonometricView: rotateX(30deg) rotateZ(-45deg)
+  // Точная обратная трансформация (порядок и знаки инвертированы):
+  const inverseIsometricTransform = "rotateZ(45deg) rotateX(-30deg)"
+
+  // Комбинируем обратную изометрическую трансформацию с желаемым 2D масштабом и поворотом
+  const finalTransform = `${inverseIsometricTransform} scale(${scale}) ${rotate ? `rotate(${rotate}deg)` : ""}`.trim()
 
   return (
-    <img
-      alt={alt}
-      // object-contain чтобы сохранить пропорции
-      // absolute позиционирование будет управляться через style
-      className={`absolute object-contain ${className}`}
-      src={src}
+    <div
+      className="absolute inset-0"
       style={{
+        transformStyle: "preserve-3d", // Сохраняем 3D для применения обратной трансформации
         transformOrigin: "center center",
-        transform: transform || undefined,
-        // Применяем внешние стили (для top, left, width, height)
-        ...style,
+        transform: finalTransform,
       }}
-    />
+    >
+      <img
+        alt={alt}
+        className={`h-full w-full object-contain ${className}`}
+        src={src}
+        style={{
+          transformStyle: "flat", // Само изображение делаем плоским
+          transformOrigin: "center center",
+          // Применяем внешние стили (для top, left, width, height)
+          ...style,
+        }}
+      />
+    </div>
   )
 }
 

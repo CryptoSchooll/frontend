@@ -1,4 +1,4 @@
-import { memo, useMemo } from "react"
+import { memo } from "react"
 
 import ClassInfoTrigger from "./ClassInfoTrigger"
 import ClassShopTrigger from "./ClassShopTrigger"
@@ -6,17 +6,14 @@ import NormalizedImage from "./NormalizedImage"
 
 import { CLASS_POSITIONS } from "@/constants"
 
+// Helper для безопасного извлечения числовых значений из CSS строк
+// (Оставим на случай, если понадобится для более сложных расчетов)
+/*
 const parsePixelValue = (value: string | undefined): number => {
   if (!value) return 0
   return parseFloat(value.replace("px", "")) || 0
 }
-
-type PositionStyle = {
-  top?: string
-  bottom?: string
-  left?: string
-  right?: string
-}
+*/
 
 const ClassMemo = ({
   classData,
@@ -25,79 +22,48 @@ const ClassMemo = ({
   classData: ClassLike
   corridorId: string
 }) => {
-  const posMeta = CLASS_POSITIONS[classData.position] as PositionStyle
-
-  const screenCoordinates = useMemo(() => {
-    const baseTop = parsePixelValue(posMeta.top)
-    const baseLeft = parsePixelValue(posMeta.left)
-
-    const verticalOffset = -45
-    const imageTop = baseTop + verticalOffset
-    const imageLeft = baseLeft
-
-    const imageWidth = 80
-    const imageHeight = 80
-
-    return { imageTop, imageLeft, imageWidth, imageHeight }
-  }, [posMeta])
-
-  const { imageTop, imageLeft, imageWidth, imageHeight } = screenCoordinates
+  const posMeta = CLASS_POSITIONS[classData.position]
 
   if (classData.isClass) {
     return (
-      <>
-        <div
-          className="absolute"
-          style={{
-            ...posMeta,
-            width: `${imageWidth}px`,
-            height: `${imageHeight * 0.7}px`,
-            transform: "translateZ(5px)",
-            opacity: 0,
-            pointerEvents: "auto",
-            zIndex: 5,
-          }}
-        >
-          <ClassInfoTrigger classData={classData} corridorId={corridorId}>
-            <div className="h-full w-full" />
-          </ClassInfoTrigger>
-        </div>
-
-        <NormalizedImage
-          alt="Classroom"
-          rotate={0}
-          scale={2}
-          src="/assets/classroom.png"
-          style={{
-            top: `${imageTop}px`,
-            left: `${imageLeft}px`,
-            width: `${imageWidth}px`,
-            height: `${imageHeight}px`,
-            pointerEvents: "none",
-            zIndex: 10,
-          }}
-        />
-
-        <div
-          className="pointer-events-none absolute z-20"
-          style={{
-            top: `${imageTop + imageHeight / 2}px`,
-            left: `${imageLeft + imageWidth / 2}px`,
-            transform: "translate(-50%, -50%)",
-          }}
-        >
-          <span className="whitespace-nowrap rounded bg-black/60 px-1.5 py-0.5 text-xs font-semibold text-white shadow-md">
-            {classData.name}
-          </span>
-        </div>
-      </>
+      <div
+        className="absolute"
+        style={{
+          ...posMeta, // Используем исходные CSS top/left/bottom/right
+          width: "84px", // Подбираем размер под картинку NormalizedImage
+          height: "84px",
+          transform: "translateZ(10px)", // Поднимаем немного над коридором
+          marginTop: "-15px", // Смещение для визуального отдаления
+          // Добавим смещение влево/вправо, если картинка позиционируется по right
+          // Это значение нужно будет подбирать или рассчитывать точнее
+          // marginLeft: posMeta.right ? '-42px' : undefined,
+        }}
+      >
+        <ClassInfoTrigger classData={classData} corridorId={corridorId}>
+          <div className="relative h-full w-full">
+            <NormalizedImage
+              alt="Classroom"
+              rotate={0} // Без дополнительного поворота
+              scale={1} // Масштаб 1:1
+              src="/assets/classroom.png"
+            />
+            {/* Текст позиционируем поверх NormalizedImage */}
+            <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center">
+              <span className="whitespace-nowrap rounded bg-black/60 px-1.5 py-0.5 text-xs font-semibold text-white shadow-md">
+                {classData.name}
+              </span>
+            </div>
+          </div>
+        </ClassInfoTrigger>
+      </div>
     )
   }
 
+  // Логика для ClassShopTrigger (плюсик)
   return (
     <div
       className="size-21 absolute flex items-center justify-center"
-      style={{ ...posMeta }}
+      style={{ ...posMeta }} // Используем исходные posMeta для плюсика
     >
       <ClassShopTrigger corridorId={corridorId} position={classData.position}>
         <div className="relative size-10 transition-transform hover:scale-110">

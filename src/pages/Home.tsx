@@ -5,17 +5,18 @@ import { useState } from "react"
 import useBalanceStore from "@/hooks/balanceStore"
 import { useGameStore } from "@/hooks/gameStore"
 
-const Grid = ({ scale }: { scale: number }) => (
+// Компонент изометрической сетки
+const Grid = () => (
   <div
-    className="absolute top-0 grid size-full grid-cols-6 grid-rows-6 border-2 border-neutral-700"
+    className="absolute inset-0 z-0 size-full" // z-0 для фона
     style={{
-      transform: `scale(${scale})`,
+      backgroundImage: `
+        repeating-linear-gradient(30deg, transparent 0, transparent 29px, rgba(173, 216, 230, 0.5) 29px, rgba(173, 216, 230, 0.5) 30px),
+        repeating-linear-gradient(150deg, transparent 0, transparent 29px, rgba(173, 216, 230, 0.5) 29px, rgba(173, 216, 230, 0.5) 30px)
+      `,
+      // backgroundSize: '30px 30px'
     }}
-  >
-    {Array.from({ length: 36 }).map((_, index) => (
-      <div key={index} className="size-full border border-neutral-700" />
-    ))}
-  </div>
+  />
 )
 
 const Home = () => {
@@ -24,28 +25,34 @@ const Home = () => {
   const { electricityOn, electricityCost, actions } = useBalanceStore()
 
   return (
-    <div className="relative h-screen bg-black">
+    <div className="relative h-screen overflow-hidden bg-white"> {/* Фон белый */}
+      {/* Сетка как фон (вне AxonometricView) */}
+      <Grid />
+      {/* Портал для 3D сцены (поверх сетки) */}
       <CameraPortal>
         <Camera>
           <AxonometricView scale={scale}>
-            <div className="z-1 relative size-[2400px]">
+            {/* Контейнер для коридоров */}
+            {/* Коридоры имеют z-10 */}
+            <div className="relative z-10 size-[2400px]">
               {corridors.map((corridor, i) => (
                 <Corridor key={i} corridorData={corridor} isFilled={filled} />
               ))}
             </div>
-            <Grid scale={1} />
           </AxonometricView>
         </Camera>
       </CameraPortal>
+      {/* UI элементы поверх всего */}
       {!electricityOn && (
         <>
-          <div className="z-1 fixed h-screen w-screen bg-black/80" />
+          <div className="fixed z-10 h-screen w-screen bg-black/80 backdrop-blur-sm" />
+          {/* " " */}
           <motion.div
             animate={{ opacity: 1, y: 0 }}
-            className="bottom-30 z-1 fixed left-1/2 w-full max-w-md -translate-x-1/2 overflow-hidden rounded-xl bg-gradient-to-b from-gray-900 to-red-950 shadow-[0_0_30px_rgba(220,38,38,0.3)]"
+            className="bottom-30 fixed left-1/2 z-20 w-full max-w-md -translate-x-1/2 overflow-hidden rounded-xl border border-red-900/50 bg-gradient-to-b from-gray-900 to-red-950 shadow-[0_0_30px_rgba(220,38,38,0.3)]"
             initial={{ opacity: 0, y: 50 }}
           >
-            {/* Декоративные элементы */}
+            {/* ... остальной UI ... */}
             <div className="absolute -left-10 top-1/2 h-32 w-32 rounded-full bg-red-700/20 blur-xl"></div>
             <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-yellow-500/10 blur-xl"></div>
 
@@ -108,16 +115,16 @@ const Home = () => {
           </motion.div>
         </>
       )}
-
-      <div className="z-1 fixed bottom-24 right-5 flex flex-col gap-3">
+      {/* Кнопки масштабирования */}
+      <div className="fixed bottom-24 right-5 z-10 flex flex-col gap-3">
         <button
-          className="rounded-full bg-purple-600 p-3 text-white shadow-lg hover:bg-purple-500 active:bg-purple-700"
+          className="rounded-full bg-purple-600 p-3 text-white shadow-lg transition hover:bg-purple-500 active:scale-95 active:bg-purple-700"
           onClick={() => setScale(scale + 0.2 <= 1.5 ? scale + 0.2 : 1.5)}
         >
           +
         </button>
         <button
-          className="rounded-full bg-purple-600 p-3 text-white shadow-lg hover:bg-purple-500 active:bg-purple-700"
+          className="rounded-full bg-purple-600 p-3 text-white shadow-lg transition hover:bg-purple-500 active:scale-95 active:bg-purple-700"
           onClick={() => setScale(scale - 0.2 >= 0.5 ? scale - 0.2 : 0.5)}
         >
           -
