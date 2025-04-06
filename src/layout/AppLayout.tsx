@@ -8,7 +8,14 @@ import useBalanceStore from "@/hooks/balanceStore"
 import usePage from "@/hooks/usePage"
 import { useUserStore } from "@/hooks/userStore"
 import { useTranslationStore } from "@/hooks/useTranslationStore"
-import { claim, getElectricity, getIncome, login } from "@/lib/query"
+import {
+  claim,
+  getCorridors,
+  getElectricity,
+  getIncome,
+  getMultiplier,
+  login,
+} from "@/lib/query"
 import {
   Broadcast,
   Club,
@@ -76,6 +83,28 @@ const AppLayout: React.FC = () => {
     enabled: Boolean(user?.token) && requests.success,
   })
 
+  const {
+    data: corridorsResult,
+    isLoading: isCorridorsLoading,
+    isError: isCorridorsError,
+  } = useQuery({
+    queryKey: ["corridors"],
+    queryFn: () => getCorridors(user!.token),
+    retry: false,
+    enabled: Boolean(user?.token) && requests.success,
+  })
+
+  const {
+    data: multiplierResult,
+    isLoading: isMultiplierLoading,
+    isError: isMultiplierError,
+  } = useQuery({
+    queryKey: ["multiplier"],
+    queryFn: () => getMultiplier(user!.token),
+    retry: false,
+    enabled: Boolean(user?.token) && requests.success,
+  })
+
   useEffect(() => {
     if (isLoginError) {
       applyError()
@@ -115,8 +144,9 @@ const AppLayout: React.FC = () => {
       return
     }
     if (!balanceResult || isBalanceLoading) return
-    setBalance(Number(balanceResult.data.balance))
-    setIncome(balanceResult.data.totalPassiveIncomePerSecond)
+
+    setBalance(Number(balanceResult.data.currentBalance))
+    setIncome(balanceResult.data.basePassiveIncomePerSecond)
 
     checkRequest("balance")
   }, [
@@ -151,11 +181,46 @@ const AppLayout: React.FC = () => {
     setElectricityCost,
   ])
 
+  useEffect(() => {
+    if (isCorridorsError) {
+      applyError()
+      return
+    }
+    if (!corridorsResult || isCorridorsLoading) return
+
+    checkRequest("corridors")
+  }, [
+    corridorsResult,
+    isCorridorsError,
+    isCorridorsLoading,
+    setUser,
+    applyError,
+    checkRequest,
+  ])
+
+  useEffect(() => {
+    if (isMultiplierError) {
+      applyError()
+      return
+    }
+    if (!multiplierResult || isMultiplierLoading) return
+
+    console.log(multiplierResult.data)
+    checkRequest("multiplier")
+  }, [
+    multiplierResult,
+    isMultiplierError,
+    isMultiplierLoading,
+    setUser,
+    applyError,
+    checkRequest,
+  ])
+
   if ((isLoginLoading && !isLoginError) || !requests.done) {
     return <div>Loading</div>
   }
 
-  if (isLoginError) {
+  if (isLoginError || !requests.success) {
     return <div>Internal Server Error</div>
   }
 

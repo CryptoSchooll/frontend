@@ -25,6 +25,8 @@ export const useUserStore = create<UserStore>((set) => ({
       claim: false,
       balance: false,
       electricity: false,
+      corridors: false,
+      multiplier: false,
     },
     done: false,
     success: true,
