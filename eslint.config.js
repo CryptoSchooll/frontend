@@ -98,7 +98,7 @@ export default tseslint.config(
         },
       ],
     },
-    ...pluginQuery.configs["flat/recommended"],
+    // ...pluginQuery.configs["flat/recommended"],
     settings: {
       react: {
         version: "detect",
