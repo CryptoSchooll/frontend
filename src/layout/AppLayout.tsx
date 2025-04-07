@@ -216,7 +216,7 @@ const AppLayout: React.FC = () => {
     checkRequest,
   ])
 
-  if ((isLoginLoading && !isLoginError) || !requests.done) {
+  if (isLoginLoading && !isLoginError && !requests.done) {
     return <div>Loading</div>
   }
 
