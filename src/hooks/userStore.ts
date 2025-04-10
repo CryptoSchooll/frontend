@@ -7,6 +7,9 @@ type UserStore = {
       login: boolean
       claim: boolean
       balance: boolean
+      electricity: boolean
+      corridors: boolean
+      multiplier: boolean
     }
     done: boolean
     success: boolean

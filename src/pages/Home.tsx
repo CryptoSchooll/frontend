@@ -31,7 +31,19 @@ const Home = () => {
 
   const payElectricityMutation = useMutation({
     mutationFn: payElectricity,
+    onSuccess: (data) => {
+      const { newBalance, paymentAmount, nextPaymentDue } = data.data
+      console.log(newBalance, paymentAmount, nextPaymentDue)
+
+      actions.setElectricityCost(Number(paymentAmount))
+      actions.setElectricityDate(new Date(nextPaymentDue))
+      actions.setBalance(Number(newBalance))
+    },
   })
+
+  const handlePayElectricity = async () => {
+    await payElectricityMutation.mutateAsync(user!.token)
+  }
 
   return (
     <div className="relative h-screen bg-black">
@@ -108,10 +120,7 @@ const Home = () => {
                   scale: 1.02,
                 }}
                 whileTap={{ scale: 0.98 }}
-                onClick={() => {
-                  payElectricityMutation.mutate(user!.token)
-                  actions.payForElectricity()
-                }}
+                onClick={handlePayElectricity}
               >
                 <span className="text-sm font-medium">
                   {translations.elecricityAction}

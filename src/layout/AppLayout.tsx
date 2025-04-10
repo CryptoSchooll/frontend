@@ -30,11 +30,17 @@ const AppLayout: React.FC = () => {
   const { currentPage } = usePage()
   const { translations } = useTranslationStore()
   const { user, setUser, requests, applyError, checkRequest } = useUserStore()
-  const { setBalance, setIncome, setElectricityCost, setElectricityDate } =
-    useBalanceStore((state) => state.actions)
+  const {
+    setBalance,
+    setIncome,
+    setElectricityCost,
+    setElectricityDate,
+    setElectricityOn,
+    checkForElectricity,
+  } = useBalanceStore((state) => state.actions)
 
   const initDataRaw =
-    "user=%7B%22id%22%3A1229587009%2C%22first_name%22%3A%22%D0%B2%D0%BB%D0%B0%D0%B4%D0%BA%22%2C%22last_name%22%3A%22%22%2C%22username%22%3A%22vshakitskiy%22%2C%22language_code%22%3A%22en%22%2C%22allows_write_to_pm%22%3Atrue%2C%22photo_url%22%3A%22https%3A%5C%2F%5C%2Ft.me%5C%2Fi%5C%2Fuserpic%5C%2F320%5C%2FVeOA9IfDQFf05Q-qkFLlZYnegZn_78alSWgArBIeKQ8.svg%22%7D&chat_instance=8718946310627105826&chat_type=private&auth_date=1743849707&signature=4wiyTHCu3rhcucuhcsYYJgDYCy1ufJgfX6v1-IOHUX3kurqLoTONICYf-BTDNGZqO_3HqQwJBqC7covXzLHrBw&hash=d76545ece7bc19cded210f5b79cc469e94950cf23a07843339a82b3988bd8539"
+    "`user=%7B%22id%22%3A1229587009%2C%22first_name%22%3A%22%D0%B2%D0%BB%D0%B0%D0%B4%D0%BA%22%2C%22last_name%22%3A%22%22%2C%22username%22%3A%22vshakitskiy%22%2C%22language_code%22%3A%22en%22%2C%22allows_write_to_pm%22%3Atrue%2C%22photo_url%22%3A%22https%3A%5C%2F%5C%2Ft.me%5C%2Fi%5C%2Fuserpic%5C%2F320%5C%2FVeOA9IfDQFf05Q-qkFLlZYnegZn_78alSWgArBIeKQ8.svg%22%7D&chat_instance=8718946310627105826&chat_type=private&auth_date=1743849707&signature=4wiyTHCu3rhcucuhcsYYJgDYCy1ufJgfX6v1-IOHUX3kurqLoTONICYf-BTDNGZqO_3HqQwJBqC7covXzLHrBw&hash=d76545ece7bc19cded210f5b79cc469e94950cf23a07843339a82b3988bd8539`"
 
   const {
     data: loginResult,
@@ -169,6 +175,11 @@ const AppLayout: React.FC = () => {
 
     setElectricityDate(new Date(electricityResult.data.nextPaymentDue))
     setElectricityCost(electricityResult.data.estimatedCost)
+    setElectricityOn(
+      new Date() >= new Date(electricityResult.data.nextPaymentDue),
+    )
+    checkForElectricity()
+
     checkRequest("electricity")
   }, [
     electricityResult,
@@ -177,8 +188,10 @@ const AppLayout: React.FC = () => {
     setUser,
     applyError,
     checkRequest,
+    checkForElectricity,
     setElectricityDate,
     setElectricityCost,
+    setElectricityOn,
   ])
 
   useEffect(() => {
@@ -215,6 +228,8 @@ const AppLayout: React.FC = () => {
     applyError,
     checkRequest,
   ])
+
+  console.log("LOADED APP")
 
   if (isLoginLoading && !isLoginError && !requests.done) {
     return <div>Loading</div>

@@ -185,6 +185,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
         newCorridor.availableDirectionsEnd = []
       }
 
+      // ADD NEW CORRIDOR TO DB
+
       set((state) => {
         const updatedCorridors = state.corridors.map((corridor) => {
           if (corridor.id === previousCorridorId) {
@@ -202,6 +204,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                   )
                 : corridor.availableDirectionsEnd
 
+            // UPDATE IN DB
             return {
               ...corridor,
               availableDirectionsStart: newDirectionsStart,
@@ -212,6 +215,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               (dir) => dir !== OPOSITE_DIRECTIONS[direction],
             )
 
+            // UPDATE IN DB
             return {
               ...corridor,
               availableDirectionsEnd: newCorridorEnd,
@@ -221,6 +225,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               (dir) => dir !== OPOSITE_DIRECTIONS[direction],
             )
 
+            // UPDATE IN DB
             return {
               ...corridor,
               availableDirectionsStart: newCorridorStart,
