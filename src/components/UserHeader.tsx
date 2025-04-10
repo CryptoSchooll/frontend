@@ -9,25 +9,27 @@ import usePage from "@/hooks/usePage"
 import { useTranslationStore } from "@/hooks/useTranslationStore"
 
 const UserHeader: FC = () => {
-  const { balance, income, incomeMultiplier } = useBalanceStore()
-  const { updateBalance, checkForMultiplier, checkForElectricity } =
-    useBalanceStore((state) => state.actions)
+  const { balance, income, incomeMultiplier, actions } = useBalanceStore()
   const { switchPage } = usePage()
   const [animateBalance, setAnimateBalance] = useState(false)
   const { language, switchLanguage } = useTranslationStore()
 
   useEffect(() => {
     const onTick = () => {
-      updateBalance()
-      checkForMultiplier()
-      checkForElectricity()
+      actions.updateBalance()
+      actions.checkForMultiplier()
+      actions.checkForElectricity()
     }
     const interval = setInterval(onTick, 1000)
 
     return () => {
       clearInterval(interval)
     }
-  }, [updateBalance, checkForMultiplier, checkForElectricity])
+  }, [
+    actions.updateBalance,
+    actions.checkForMultiplier,
+    actions.checkForElectricity,
+  ])
 
   // Анимация при изменении баланса
   useEffect(() => {

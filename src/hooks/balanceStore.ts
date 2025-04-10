@@ -20,6 +20,7 @@ type balanceStore = {
     canAfford: (cost: number) => boolean
     setElectricityDate: (date: Date) => void
     setElectricityCost: (cost: number) => void
+    setElectricityOn: (value: boolean) => void
     payForElectricity: () => boolean
     checkForElectricity: () => void
     activateMultiplier: (multiplier: number, durationHours: number) => void
@@ -32,7 +33,7 @@ const ELECTRICITY_COST = 50
 const DEFAULT_INCOME_MULTIPLIER = 1
 
 const useBalanceStore = create<balanceStore>((set, get) => ({
-  balance: ELECTRICITY_COST + 10000,
+  balance: ELECTRICITY_COST,
   income: 10,
   electricityPaidUntil: null,
   electricityCost: ELECTRICITY_COST,
@@ -95,36 +96,36 @@ const useBalanceStore = create<balanceStore>((set, get) => ({
       set({ electricityCost: cost })
     },
     payForElectricity: () => {
-      const { balance, electricityCost } = get()
-      if (balance < electricityCost) return false
+      // const { balance, electricityCost } = get()
+      // if (balance < electricityCost) return false
 
-      const now = new Date()
-      const expiryDate = new Date(
-        now.getTime() + ELECTRICITY_DURATION_HOURS * 60 * 60 * 1000,
-      )
+      // const now = new Date()
+      // const expiryDate = new Date(
+      //   now.getTime() + ELECTRICITY_DURATION_HOURS * 60 * 1000,
+      // )
 
-      set((state) => ({
-        balance: state.balance - electricityCost,
-        electricityPaidUntil: expiryDate,
-        electricityOn: true,
-      }))
+      // set((state) => ({
+      //   balance: state.balance - electricityCost,
+      //   electricityPaidUntil: expiryDate,
+      //   electricityOn: true,
+      // }))
 
       return true
     },
+    setElectricityOn: (value) => set({ electricityOn: value }),
     checkForElectricity: () => {
       const { electricityPaidUntil } = get()
 
       const now = new Date()
       set({
-        electricityOn:
-          Boolean(electricityPaidUntil) && now < electricityPaidUntil!,
+        electricityOn: now < electricityPaidUntil!,
       })
     },
     activateMultiplier: (multiplier, durationHours) => {
       if (multiplier <= DEFAULT_INCOME_MULTIPLIER || durationHours <= 0) return
       const now = new Date()
       const expiryDate = new Date(
-        now.getTime() + durationHours * 60 * 60 * 1000,
+        now.getTime() + durationHours * 60 * 1000,
       )
 
       set({
