@@ -8,15 +8,15 @@ import { useGameStore } from "@/hooks/gameStore"
 
 const Grid = ({ scale }: { scale: number }) => (
   <div
-    className="absolute top-0 grid size-full grid-cols-6 grid-rows-6 border-2 border-neutral-700"
+    className="absolute top-0 size-full border-2 border-neutral-700"
     style={{
       transform: `scale(${scale})`,
+      backgroundImage: `
+        repeating-linear-gradient(30deg, transparent 0, transparent 29px, rgba(173, 216, 230, 0.5) 29px, rgba(173, 216, 230, 0.5) 30px),
+        repeating-linear-gradient(150deg, transparent 0, transparent 29px, rgba(173, 216, 230, 0.5) 29px, rgba(173, 216, 230, 0.5) 30px)
+      `,
     }}
-  >
-    {Array.from({ length: 36 }).map((_, index) => (
-      <div key={index} className="size-full border border-neutral-700" />
-    ))}
-  </div>
+  />
 )
 
 const Home = () => {
@@ -31,7 +31,8 @@ const Home = () => {
           <div
             className="z-1 relative size-[2400px]"
             style={{
-              transform: `scale(${scale})`,
+              transform: `scale(${scale}) rotateX(54.8deg) rotateZ(45deg)`,
+              transformStyle: "preserve-3d",
             }}
           >
             {corridors.map((corridor, i) => (
