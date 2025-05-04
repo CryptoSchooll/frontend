@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query"
-import { initData } from "@telegram-apps/sdk-react"
+// import { initData } from "@telegram-apps/sdk-react"
 import { useEffect } from "react"
 
 import { Navbar, UserHeader } from "@/components"
@@ -40,7 +40,7 @@ const AppLayout: React.FC = () => {
   } = useBalanceStore((state) => state.actions)
 
   const initDataRaw =
-    "`user=%7B%22id%22%3A1229587009%2C%22first_name%22%3A%22%D0%B2%D0%BB%D0%B0%D0%B4%D0%BA%22%2C%22last_name%22%3A%22%22%2C%22username%22%3A%22vshakitskiy%22%2C%22language_code%22%3A%22en%22%2C%22allows_write_to_pm%22%3Atrue%2C%22photo_url%22%3A%22https%3A%5C%2F%5C%2Ft.me%5C%2Fi%5C%2Fuserpic%5C%2F320%5C%2FVeOA9IfDQFf05Q-qkFLlZYnegZn_78alSWgArBIeKQ8.svg%22%7D&chat_instance=8718946310627105826&chat_type=private&auth_date=1743849707&signature=4wiyTHCu3rhcucuhcsYYJgDYCy1ufJgfX6v1-IOHUX3kurqLoTONICYf-BTDNGZqO_3HqQwJBqC7covXzLHrBw&hash=d76545ece7bc19cded210f5b79cc469e94950cf23a07843339a82b3988bd8539`"
+    "user=%7B%22id%22%3A1229587009%2C%22first_name%22%3A%22%D0%B2%D0%BB%D0%B0%D0%B4%D0%BA%22%2C%22last_name%22%3A%22%22%2C%22username%22%3A%22vshakitskiy%22%2C%22language_code%22%3A%22en%22%2C%22allows_write_to_pm%22%3Atrue%2C%22photo_url%22%3A%22https%3A%5C%2F%5C%2Ft.me%5C%2Fi%5C%2Fuserpic%5C%2F320%5C%2FVeOA9IfDQFf05Q-qkFLlZYnegZn_78alSWgArBIeKQ8.svg%22%7D&chat_instance=8718946310627105826&chat_type=private&auth_date=1744443325&signature=UMGJdPi8Ruo68ubxku8Qd5towSozu6GuU2KkUO5-Rg1bKVEs9OtAMzO2RjwGwn3NDPx3rrjuuw-Ftkdkij0dDw&hash=b694e8aafec2eb70e654d9990e0affebfeba4ca5c77a2e5cec319b4b0b541a78"
 
   const {
     data: loginResult,
@@ -174,7 +174,7 @@ const AppLayout: React.FC = () => {
     if (!electricityResult || isElectricityLoading) return
 
     setElectricityDate(new Date(electricityResult.data.nextPaymentDue))
-    setElectricityCost(electricityResult.data.estimatedCost)
+    setElectricityCost(Number(electricityResult.data.estimatedCost))
     setElectricityOn(
       new Date() >= new Date(electricityResult.data.nextPaymentDue),
     )

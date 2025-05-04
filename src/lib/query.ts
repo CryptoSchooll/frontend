@@ -46,7 +46,7 @@ export const claim = async (token: string) => {
 }
 
 export const getIncome = async (token: string) => {
-  const res = await client.get(ENDPOINTS.getIncome, {
+  const res = await client.get<IncomeResponse>(ENDPOINTS.getIncome, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -56,7 +56,7 @@ export const getIncome = async (token: string) => {
 }
 
 export const getElectricity = async (token: string) => {
-  const res = await client.get(ENDPOINTS.getElectricity, {
+  const res = await client.get<ElectricityResponse>(ENDPOINTS.getElectricity, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -66,11 +66,15 @@ export const getElectricity = async (token: string) => {
 }
 
 export const payElectricity = async (token: string) => {
-  const res = await client.post(ENDPOINTS.payElectricity, null, {
-    headers: {
-      Authorization: `Bearer ${token}`,
+  const res = await client.post<payElectricityResponse>(
+    ENDPOINTS.payElectricity,
+    null,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     },
-  })
+  )
 
   return res.data
 }
