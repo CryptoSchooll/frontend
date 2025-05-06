@@ -6,11 +6,30 @@ import { useEffect, useState } from "react"
 
 import useBalanceStore from "@/hooks/balanceStore"
 import usePage from "@/hooks/usePage"
+import { useTranslationStore } from "@/hooks/useTranslationStore"
 
 const UserHeader: FC = () => {
-  const { balance, income } = useBalanceStore()
+  const { balance, income, incomeMultiplier, actions } = useBalanceStore()
   const { switchPage } = usePage()
   const [animateBalance, setAnimateBalance] = useState(false)
+  const { language, switchLanguage } = useTranslationStore()
+
+  useEffect(() => {
+    const onTick = () => {
+      actions.updateBalance()
+      actions.checkForMultiplier()
+      actions.checkForElectricity()
+    }
+    const interval = setInterval(onTick, 1000)
+
+    return () => {
+      clearInterval(interval)
+    }
+  }, [
+    actions.updateBalance,
+    actions.checkForMultiplier,
+    actions.checkForElectricity,
+  ])
 
   // Анимация при изменении баланса
   useEffect(() => {
@@ -27,12 +46,12 @@ const UserHeader: FC = () => {
     <div className="relative mx-auto w-full max-w-md px-2 py-2">
       {/* Фоновый градиент с размытием */}
       <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-indigo-950/90 via-purple-950/80 to-indigo-950/90 shadow-xl backdrop-blur-md"></div>
-      
+
       {/* Декоративные элементы - узоры и свечение */}
       <div className="absolute -left-1 top-1/2 h-20 w-20 -translate-y-1/2 rounded-full bg-purple-600/10 blur-2xl"></div>
       <div className="absolute -right-1 top-1/2 h-16 w-16 -translate-y-1/2 rounded-full bg-indigo-600/10 blur-xl"></div>
       <div className="absolute inset-x-0 bottom-0 h-[1px] bg-gradient-to-r from-transparent via-purple-500/30 to-transparent"></div>
-      
+
       {/* Основной контент */}
       <div className="relative flex items-center justify-between gap-3 px-3 py-2">
         {/* Аватар пользователя с улучшенным свечением */}
@@ -72,7 +91,11 @@ const UserHeader: FC = () => {
 
         {/* Правая часть - множитель с улучшенным дизайном */}
         <div className="flex h-10 items-center justify-center rounded-lg bg-gradient-to-br from-purple-800 to-indigo-900 px-3 font-medium text-white shadow-lg ring-1 ring-white/10">
-          <span className="text-sm">×{(1.3).toFixed(1)}</span>
+          <span className="text-sm">×{incomeMultiplier.toFixed(1)}</span>
+        </div>
+
+        <div className="" onClick={() => switchLanguage()}>
+          {language}
         </div>
       </div>
     </div>
