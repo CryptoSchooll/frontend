@@ -89,7 +89,12 @@ const CorridorMemo = ({
 
       <div className="relative">
         {validatedClasses.map((classData, i) => (
-          <Class key={i} classData={classData} corridorId={corridorData.id} />
+          <Class
+            key={i}
+            classData={classData}
+            coridorDirection={corridorData.direction}
+            corridorId={corridorData.id}
+          />
         ))}
       </div>
     </div>
