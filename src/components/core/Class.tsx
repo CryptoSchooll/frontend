@@ -26,6 +26,9 @@ const ClassMemo = ({
     left: `translate(10%, 10%) rotate(135deg) scaleY(2) scaleX(1.15) scale(1.5)`,
   }
 
+  const paramsForPosLeftIndex =
+    coridorDirection === "left" && classData.position === 1 ? 1 : 0
+
   if (classData.isClass) {
     return (
       <div
@@ -34,18 +37,21 @@ const ClassMemo = ({
           ...posMeta,
           width: TILE,
           height: TILE,
+          background: "green", // Технический параметр
         }}
       >
         <ClassInfoTrigger classData={classData} corridorId={corridorId}>
           <div
             style={{
+              cursor: "pointer", // Технический параметр
+              background: "red", // Технический параметр
               height: "100%",
               width: "100%",
               position: "relative",
             }}
           >
             {/* {coridorDirection} */}
-            {/* {classData.position} */}
+            {classData.position}
             <img
               alt={classData.name}
               draggable={false}
@@ -57,6 +63,7 @@ const ClassMemo = ({
                 right: "-20%",
                 transformOrigin: "center center",
                 transform: paramsForClassTransform[coridorDirection],
+                zIndex: paramsForPosLeftIndex,
               }}
               width={TILE}
             />
