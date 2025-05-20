@@ -19,6 +19,43 @@ const client = axios.create({
   },
 })
 
+// Логирование всех запросов и ответов
+client.interceptors.request.use((config) => {
+  console.log(
+    "[API REQUEST]",
+    config.method?.toUpperCase(),
+    config.url,
+    config.data || config.params,
+    config.headers,
+  )
+  return config
+})
+
+client.interceptors.response.use(
+  (response) => {
+    console.log(
+      "[API RESPONSE]",
+      response.config.url,
+      response.status,
+      response.data,
+    )
+    return response
+  },
+  (error) => {
+    if (error.response) {
+      console.log(
+        "[API ERROR RESPONSE]",
+        error.response.config.url,
+        error.response.status,
+        error.response.data,
+      )
+    } else {
+      console.log("[API ERROR]", error.message)
+    }
+    return Promise.reject(error)
+  }
+)
+
 export const login = async (rawInitData: string) => {
   const res = await client.post<LoginResponse>(
     ENDPOINTS.login,

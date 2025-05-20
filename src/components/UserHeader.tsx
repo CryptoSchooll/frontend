@@ -6,6 +6,7 @@ import { useEffect, useState } from "react"
 
 import useBalanceStore from "@/hooks/balanceStore"
 import usePage from "@/hooks/usePage"
+import { useUserStore } from "@/hooks/userStore"
 import { useTranslationStore } from "@/hooks/useTranslationStore"
 
 const UserHeader: FC = () => {
@@ -13,6 +14,13 @@ const UserHeader: FC = () => {
   const { switchPage } = usePage()
   const [animateBalance, setAnimateBalance] = useState(false)
   const { language, switchLanguage } = useTranslationStore()
+  const user = useUserStore((state) => state.user)
+
+  // Корректно получаем photo_url для разных структур user
+  const avatarUrl =
+    user?.photo_url ||
+    user?.tmaData?.user?.photo_url ||
+    "https://via.placeholder.com/150"
 
   useEffect(() => {
     const onTick = () => {
@@ -60,7 +68,7 @@ const UserHeader: FC = () => {
           <img
             alt="Аватар"
             className="relative h-12 w-12 rounded-full border border-white/40 object-cover shadow-inner"
-            src="https://via.placeholder.com/150"
+            src={avatarUrl}
           />
         </div>
 

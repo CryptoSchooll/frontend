@@ -42,6 +42,7 @@ const Home = () => {
   })
 
   const handlePayElectricity = async () => {
+    console.log(user)
     await payElectricityMutation.mutateAsync(user!.token)
   }
 

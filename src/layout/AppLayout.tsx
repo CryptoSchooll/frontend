@@ -1,6 +1,8 @@
 import { useQuery } from "@tanstack/react-query"
 // import { initData } from "@telegram-apps/sdk-react"
-import { useEffect } from "react"
+import { retrieveLaunchParams } from "@telegram-apps/sdk"
+import { initData as sdkInitData } from "@telegram-apps/sdk"
+import { useEffect, useState } from "react"
 
 import { Navbar, UserHeader } from "@/components"
 import { GlobalUI } from "@/components/GlobalUI"
@@ -26,6 +28,17 @@ import {
   Tasks,
 } from "@/pages"
 
+declare global {
+  interface Window {
+    Telegram?: {
+      WebApp?: {
+        initData?: string
+        // можно добавить другие поля, если нужно
+      }
+    }
+  }
+}
+
 const AppLayout: React.FC = () => {
   const { currentPage } = usePage()
   const { translations } = useTranslationStore()
@@ -38,18 +51,76 @@ const AppLayout: React.FC = () => {
     setElectricityOn,
     checkForElectricity,
   } = useBalanceStore((state) => state.actions)
+  const [finalInitDataRaw, setFinalInitDataRaw] = useState<string | undefined>(
+    undefined,
+  )
 
-  const initDataRaw =
-    "user=%7B%22id%22%3A1229587009%2C%22first_name%22%3A%22%D0%B2%D0%BB%D0%B0%D0%B4%D0%BA%22%2C%22last_name%22%3A%22%22%2C%22username%22%3A%22vshakitskiy%22%2C%22language_code%22%3A%22en%22%2C%22allows_write_to_pm%22%3Atrue%2C%22photo_url%22%3A%22https%3A%5C%2F%5C%2Ft.me%5C%2Fi%5C%2Fuserpic%5C%2F320%5C%2FVeOA9IfDQFf05Q-qkFLlZYnegZn_78alSWgArBIeKQ8.svg%22%7D&chat_instance=8718946310627105826&chat_type=private&auth_date=1744443325&signature=UMGJdPi8Ruo68ubxku8Qd5towSozu6GuU2KkUO5-Rg1bKVEs9OtAMzO2RjwGwn3NDPx3rrjuuw-Ftkdkij0dDw&hash=b694e8aafec2eb70e654d9990e0affebfeba4ca5c77a2e5cec319b4b0b541a78"
+  useEffect(() => {
+    function fetchAndSetInitData() {
+      try {
+        sdkInitData.restore()
+
+        const rawData = sdkInitData.raw()
+        console.log("[AppLayout COMPONENT] sdkInitData.raw():", rawData)
+
+        const parsedState = sdkInitData.state()
+        console.log("[AppLayout COMPONENT] sdkInitData.state():", parsedState)
+        console.log(
+          "[AppLayout COMPONENT] sdkInitData.user():",
+          sdkInitData.user(),
+        )
+        console.log(
+          "[AppLayout COMPONENT] sdkInitData.hash():",
+          sdkInitData.hash(),
+        )
+
+        const { initDataRaw: lpInitDataRaw } = retrieveLaunchParams()
+        console.log(
+          "[AppLayout COMPONENT] retrieveLaunchParams().initDataRaw:",
+          lpInitDataRaw,
+        )
+        const windowData = window.Telegram?.WebApp?.initData
+        console.log(
+          "[AppLayout COMPONENT] window.Telegram.WebApp.initData:",
+          windowData,
+        )
+
+        if (rawData) {
+          setFinalInitDataRaw(rawData)
+        } else if (lpInitDataRaw) {
+          setFinalInitDataRaw(lpInitDataRaw)
+        } else if (windowData) {
+          setFinalInitDataRaw(windowData)
+        } else {
+          console.error(
+            "[AppLayout COMPONENT] Не удалось получить initData ни одним из способов.",
+          )
+        }
+      } catch (error) {
+        console.error(
+          "[AppLayout COMPONENT] Ошибка при работе с sdkInitData:",
+          error,
+        )
+      }
+    }
+
+    fetchAndSetInitData()
+  }, [])
 
   const {
     data: loginResult,
     isLoading: isLoginLoading,
     isError: isLoginError,
   } = useQuery({
-    queryKey: ["auth", initDataRaw],
-    queryFn: () => login(initDataRaw),
+    queryKey: ["auth", finalInitDataRaw],
+    queryFn: () => {
+      if (!finalInitDataRaw) {
+        return Promise.reject(new Error("initData is not available for login."))
+      }
+      return login(finalInitDataRaw)
+    },
     retry: false,
+    enabled: !!finalInitDataRaw,
   })
 
   const {
@@ -117,8 +188,10 @@ const AppLayout: React.FC = () => {
       return
     }
     if (!loginResult || isLoginLoading) return
+    console.log("Данные пользователя получены:", loginResult.data)
     setUser(loginResult.data)
     checkRequest("login")
+    console.log("userStore после авторизации:", useUserStore.getState())
   }, [
     loginResult,
     setUser,
@@ -229,7 +302,7 @@ const AppLayout: React.FC = () => {
     checkRequest,
   ])
 
-  console.log("LOADED APP")
+  console.log("LOADED APP", { finalInitDataRawValue: finalInitDataRaw })
 
   if (isLoginLoading && !isLoginError && !requests.done) {
     return <div>Loading</div>
